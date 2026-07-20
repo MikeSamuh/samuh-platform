@@ -1,0 +1,17 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 8px 48px 48px;
+  max-width: 960px;
+}
+
+.placeholder {
+  background: var(--inset);
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+  padding: 40px 24px;
+  color: var(--text-faint);
+  font-size: 13px;
+  text-align: center;
+}

@@ -1,0 +1,65 @@
+.nav {
+  position: relative;
+  padding: 32px 48px 24px;
+}
+
+.line {
+  position: absolute;
+  left: 48px;
+  right: 48px;
+  top: 43px;
+  height: 2px;
+  background: var(--border);
+}
+
+.steps {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--card);
+  border: 2px solid var(--text-faint);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.step:hover .dot {
+  border-color: var(--text-dim);
+}
+
+.step:focus-visible .dot {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.label {
+  font-size: 13px;
+  color: var(--text-dim);
+  transition: color 0.15s ease;
+}
+
+.step[data-active="true"] .dot {
+  background: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(74, 158, 255, 0.25);
+}
+
+.step[data-active="true"] .label {
+  color: var(--text);
+  font-weight: 600;
+}

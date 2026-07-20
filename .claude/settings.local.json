@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx --yes create-next-app@latest . --js --no-tailwind --eslint --app --src-dir --import-alias \"@/*\" --use-npm --no-turbopack)",
+      "Bash(npx --yes create-next-app@latest samuh-platform --js --no-tailwind --eslint --app --src-dir --import-alias \"@/*\" --use-npm --no-turbopack)",
+      "Bash(SRC=\"/private/tmp/claude-501/-Users-mike-Library-CloudStorage-GoogleDrive-mike-samuh-work-Shared-drives-Samuh-Platform-Claud-Code/346ed861-e88b-488c-91aa-536aa82cfa94/scratchpad/samuh-platform\" *)",
+      "Bash(find '/Users/mike/Library/CloudStorage/GoogleDrive-mike@samuh.work/Shared drives/Samuh/Platform/Claud Code/node_modules/next/dist/docs/01-app' -iname *getting-started* -o -iname *layout*)",
+      "Bash(npm install *)",
+      "Bash(git add *)"
+    ]
+  }
+}
