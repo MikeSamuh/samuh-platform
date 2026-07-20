@@ -7,7 +7,9 @@
       "Bash(find '/Users/mike/Library/CloudStorage/GoogleDrive-mike@samuh.work/Shared drives/Samuh/Platform/Claud Code/node_modules/next/dist/docs/01-app' -iname *getting-started* -o -iname *layout*)",
       "Bash(npm install *)",
       "Bash(git add *)",
-      "Bash(git commit -m ' *)"
+      "Bash(git commit -m ' *)",
+      "Bash(ls -la \"/Users/mike/Downloads/samuh-reference.zip\" 2>&1)",
+      "Bash(unzip -o /Users/mike/Downloads/samuh-reference.zip -d /private/tmp/claude-501/-Users-mike-Library-CloudStorage-GoogleDrive-mike-samuh-work-Shared-drives-Samuh-Platform-Claud-Code/346ed861-e88b-488c-91aa-536aa82cfa94/scratchpad/samuh-reference)"
     ]
   }
 }
