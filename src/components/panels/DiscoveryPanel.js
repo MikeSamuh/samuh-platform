@@ -1,4 +1,6 @@
 import Instructions from "@/components/Instructions";
+import TeamQVisual from "@/components/discovery/TeamQVisual";
+import TeamMembers from "@/components/discovery/TeamMembers";
 import styles from "./Panel.module.css";
 
 const instructions = `
@@ -9,13 +11,12 @@ const instructions = `
 5. Go through the Keystone practices.
 `;
 
-export default function PreparePanel() {
+export default function DiscoveryPanel({ members, addMember, removeMember }) {
   return (
     <div className={styles.panel}>
-      <div className={styles.placeholder}>
-        TeamQ visual + team members will render here.
-      </div>
+      <TeamQVisual />
       <Instructions markdown={instructions} />
+      <TeamMembers members={members} onAdd={addMember} onRemove={removeMember} />
     </div>
   );
 }

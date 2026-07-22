@@ -1,4 +1,5 @@
 import Instructions from "@/components/Instructions";
+import PracticeTiles from "@/components/belonging/PracticeTiles";
 import styles from "./Panel.module.css";
 
 const instructions = `
@@ -10,9 +11,7 @@ const instructions = `
 export default function BelongingPanel() {
   return (
     <div className={styles.panel}>
-      <div className={styles.placeholder}>
-        Practice tiles (accordion, media players) will render here.
-      </div>
+      <PracticeTiles />
       <Instructions markdown={instructions} />
     </div>
   );

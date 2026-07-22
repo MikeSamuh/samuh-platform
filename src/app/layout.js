@@ -1,4 +1,4 @@
-import { Geist, Geist_Mono, Lora } from "next/font/google";
+import { Geist, Geist_Mono, Lora, Caveat } from "next/font/google";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -16,6 +16,11 @@ const lora = Lora({
   subsets: ["latin"],
 });
 
+const caveat = Caveat({
+  variable: "--font-hand",
+  subsets: ["latin"],
+});
+
 export const metadata = {
   title: "Samuh Platform",
   description: "Samuh team-journey app",
@@ -25,7 +30,7 @@ export default function RootLayout({ children }) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${lora.variable}`}
+      className={`${geistSans.variable} ${geistMono.variable} ${lora.variable} ${caveat.variable}`}
     >
       <body>{children}</body>
     </html>

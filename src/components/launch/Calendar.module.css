@@ -1,0 +1,58 @@
+.calendar {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 15px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.title {
+  font-size: 13px;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.subtitle {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-bottom: 12px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.weekday {
+  height: 18px;
+  font-size: 10px;
+  color: var(--text-faint);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.day {
+  height: 26px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 11px;
+  background: transparent;
+  color: #c8c9cb;
+}
+
+.day:hover {
+  background: var(--chip);
+}
+
+.day[data-on="true"] {
+  color: #fff;
+}

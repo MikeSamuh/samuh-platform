@@ -4,9 +4,12 @@
   --inset: #0e0f10;
   --border: #333438;
   --accent: #4a9eff;
+  --accent-button: #2f7fe0;
+  --accent-purple: #7f77dd;
   --text: #e8e9eb;
   --text-dim: #8a8d93;
   --text-faint: #55585e;
+  --chip: #2b2c2e;
 
   --band-thriving: #3ba55d;
   --band-succeeding: #2b8bd4;
@@ -17,6 +20,7 @@
 
   --chart-pink: #d6409a;
   --chart-teal: #3a95ac;
+  --practice-icon: #d96a8a;
 
   color-scheme: dark;
 }

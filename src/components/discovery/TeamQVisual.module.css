@@ -1,0 +1,88 @@
+.visual {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr 1fr;
+  gap: 12px;
+  align-items: center;
+  background: var(--inset);
+  border-radius: 10px;
+  padding: 20px 16px;
+}
+
+.column {
+  text-align: center;
+}
+
+.wordmark {
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: 22px;
+  color: var(--text);
+}
+
+.score {
+  font-size: 38px;
+  font-weight: 500;
+  color: var(--text);
+  margin-top: 8px;
+  line-height: 1;
+}
+
+.scoreUnit {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.label {
+  font-size: 12px;
+  color: #cfd0d2;
+  margin-bottom: 10px;
+}
+
+.capacityRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.pointer {
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.band {
+  display: flex;
+  flex-direction: column;
+}
+
+.tier {
+  display: flex;
+  align-items: center;
+  height: 24px;
+}
+
+.swatch {
+  width: 18px;
+  height: 100%;
+  flex: none;
+}
+
+.tierLabel {
+  font-size: 11px;
+  color: #cfd0d2;
+  margin-left: 8px;
+  white-space: nowrap;
+}
+
+.loss {
+  font-size: 34px;
+  font-weight: 500;
+  color: var(--text);
+  margin-top: 8px;
+  line-height: 1;
+}
+
+.lossSub {
+  font-size: 12px;
+  color: var(--text-dim);
+}
