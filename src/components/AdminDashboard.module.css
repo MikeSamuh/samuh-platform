@@ -3,7 +3,7 @@
   flex-direction: column;
   gap: 20px;
   padding: 8px 48px 48px;
-  max-width: 1180px;
+  max-width: 1020px;
 }
 
 .eyebrow {
@@ -35,9 +35,9 @@
 }
 
 .stepLabel {
-  width: 160px;
+  width: 125px;
   flex: none;
-  font-size: 20px;
+  font-size: var(--fs-body);
   color: var(--text);
 }
 
@@ -81,7 +81,7 @@
   background: var(--inset);
   border-radius: 8px;
   padding: 10px 12px;
-  font-size: 20px;
+  font-size: var(--fs-body);
   color: var(--text-dim);
 }
 
@@ -101,12 +101,12 @@
 .table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 20px;
+  font-size: var(--fs-body);
 }
 
 .table th {
   text-align: left;
-  font-size: 20px;
+  font-size: var(--fs-body);
   color: var(--text-faint);
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -133,7 +133,7 @@
 
 .badge {
   display: inline-block;
-  font-size: 20px;
+  font-size: var(--fs-body);
   text-transform: uppercase;
   letter-spacing: 0.04em;
   border-radius: 8px;
@@ -152,14 +152,40 @@
 }
 
 .empty {
-  font-size: 20px;
+  font-size: var(--fs-body);
   color: var(--text-faint);
   padding: 6px 0;
 }
 
 .teamMeta {
-  font-size: 20px;
+  font-size: var(--fs-body);
   font-weight: 400;
   color: var(--text-faint);
   margin-left: 9px;
+}
+
+@media (max-width: 760px) {
+  .panel {
+    padding: 8px 16px 40px;
+  }
+}
+
+@media (max-width: 760px) {
+  .table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .stepRow {
+    flex-wrap: wrap;
+  }
+
+  .stepLabel {
+    width: 100%;
+  }
+
+  .milestones {
+    grid-template-columns: 1fr;
+  }
 }

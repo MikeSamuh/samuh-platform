@@ -72,7 +72,7 @@ export default function Reflections({ reflections, onAdd, canPost }) {
               key={word}
               className={styles.cloudWord}
               style={{
-                fontSize: `${20 + (count / maxCount) * 26}px`,
+                fontSize: `${15 + (count / maxCount) * 22}px`,
                 color: MEMBER_COLORS[i % MEMBER_COLORS.length],
                 opacity: 0.55 + (count / maxCount) * 0.45,
               }}

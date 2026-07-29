@@ -8,7 +8,7 @@
   border: none;
   border-radius: 8px;
   color: #fff;
-  font-size: 22px;
+  font-size: var(--fs-body);
   font-weight: 500;
   padding: 11px;
   cursor: pointer;
@@ -24,7 +24,7 @@
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 12px 15px;
-  font-size: 20px;
+  font-size: var(--fs-body);
   color: var(--text);
 }
 
@@ -60,7 +60,7 @@
   border: 1px solid var(--border);
   border-radius: 8px;
   color: var(--text);
-  font-size: 20px;
+  font-size: var(--fs-body);
   padding: 0 15px;
   cursor: pointer;
 }
@@ -70,7 +70,18 @@
 }
 
 .launchedAt {
-  font-size: 20px;
+  font-size: var(--fs-body);
   color: var(--text-dim);
   margin-top: 4px;
+}
+
+@media (max-width: 760px) {
+  .statusRow {
+    flex-direction: column;
+  }
+
+  .relaunchButton {
+    justify-content: center;
+    padding: 12px 15px;
+  }
 }

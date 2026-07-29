@@ -23,13 +23,13 @@
   --practice-icon: #d96a8a;
 
 
-  /* Type scale — 20px floor, used for every title/subtitle in the app. */
-  --fs-eyebrow: 20px;   /* uppercase micro-labels */
-  --fs-body: 20px;      /* body copy, inputs, buttons */
-  --fs-sub: 20px;       /* subtitles under a title */
-  --fs-title: 26px;     /* card and section titles */
-  --fs-heading: 32px;   /* panel headings */
-  --fs-display: 44px;   /* hero numbers */
+  /* Type scale — titles 14, body 11, labels 9. */
+  --fs-eyebrow: 9px;    /* uppercase micro-labels */
+  --fs-body: 11px;      /* body copy, inputs, buttons */
+  --fs-sub: 10px;       /* subtitles under a title */
+  --fs-title: 14px;     /* card and section titles */
+  --fs-heading: 18px;   /* panel headings */
+  --fs-display: 27px;   /* hero numbers */
 
   color-scheme: dark;
 }
@@ -51,7 +51,7 @@ body {
   color: var(--text);
   background: var(--surface);
   font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  font-size: 22px;
+  font-size: var(--fs-body);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

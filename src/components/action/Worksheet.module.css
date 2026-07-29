@@ -37,7 +37,7 @@
   border: none;
   border-radius: 8px;
   color: #fff;
-  font-size: 20px;
+  font-size: var(--fs-body);
   font-weight: 500;
   padding: 7px 13px;
   cursor: pointer;
@@ -141,7 +141,7 @@
 }
 
 .noteAuthor {
-  font-size: 20px;
+  font-size: var(--fs-body);
   font-weight: 600;
   letter-spacing: 0.03em;
   color: var(--text-faint);
@@ -169,7 +169,7 @@
 }
 
 .text {
-  font-size: 20px;
+  font-size: var(--fs-body);
   line-height: 1.45;
   color: var(--text);
   outline: none;
@@ -233,7 +233,7 @@
   border: 1px solid var(--border);
   border-radius: 8px;
   color: var(--text);
-  font-size: 20px;
+  font-size: var(--fs-body);
   font-weight: 500;
   padding: 8px 32px 8px 12px;
   outline: none;
@@ -260,7 +260,7 @@
   border: 1px solid var(--border);
   border-radius: 8px;
   color: var(--text);
-  font-size: 20px;
+  font-size: var(--fs-body);
   padding: 7px 12px;
   cursor: pointer;
 }
@@ -275,7 +275,7 @@
   border: 1px solid var(--border);
   border-radius: 8px;
   color: var(--text);
-  font-size: 20px;
+  font-size: var(--fs-body);
   padding: 7px 11px;
   outline: none;
   min-width: 200px;
@@ -290,7 +290,7 @@
   border: none;
   border-radius: 8px;
   color: #fff;
-  font-size: 20px;
+  font-size: var(--fs-body);
   font-weight: 500;
   padding: 7px 13px;
   cursor: pointer;
@@ -301,7 +301,7 @@
   border: 1px solid var(--border);
   border-radius: 8px;
   color: var(--text-faint);
-  font-size: 20px;
+  font-size: var(--fs-body);
   padding: 7px 12px;
   cursor: pointer;
 }
@@ -309,4 +309,40 @@
 .removeCanvas:hover {
   color: var(--band-distressed);
   border-color: var(--band-distressed);
+}
+
+@media (max-width: 760px) {
+  .board {
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+    grid-template-areas:
+      "what" "why" "when" "who" "how" "prep";
+  }
+
+  .zone {
+    grid-area: auto !important;
+  }
+
+  .zoneCanvas {
+    min-height: 150px;
+  }
+
+  .practiceBar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .practiceSelect {
+    max-width: none;
+    width: 100%;
+  }
+
+  .newPracticeRow {
+    flex-wrap: wrap;
+  }
+
+  .newPracticeInput {
+    min-width: 0;
+    flex: 1;
+  }
 }

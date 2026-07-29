@@ -3,7 +3,7 @@
   flex-direction: column;
   gap: 20px;
   padding: 8px 48px 48px;
-  max-width: 1180px;
+  max-width: 1020px;
 }
 
 .placeholder {
@@ -12,7 +12,7 @@
   border-radius: 10px;
   padding: 40px 24px;
   color: var(--text-faint);
-  font-size: 20px;
+  font-size: var(--fs-body);
   text-align: center;
 }
 
@@ -26,7 +26,7 @@
   border: 1px dashed var(--border);
   border-radius: 10px;
   color: var(--text-dim);
-  font-size: 20px;
+  font-size: var(--fs-body);
   padding: 14px;
   cursor: pointer;
   transition: border-color 0.15s ease, color 0.15s ease;
@@ -35,4 +35,10 @@
 .addCanvasButton:hover {
   border-color: var(--accent);
   color: var(--text);
+}
+
+@media (max-width: 760px) {
+  .panel {
+    padding: 8px 16px 40px;
+  }
 }

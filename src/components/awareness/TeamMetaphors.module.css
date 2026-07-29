@@ -35,7 +35,7 @@
 }
 
 .counter {
-  font-size: 20px;
+  font-size: var(--fs-body);
   color: var(--text-dim);
   min-width: 40px;
   text-align: right;
@@ -75,7 +75,7 @@
 /* Black cards with white line art, matching the Discover deck. */
 .bigCard {
   flex: none;
-  width: min(330px, 76%);
+  width: min(300px, 74%);
   scroll-snap-align: center;
   background: #000;
   border: 1px solid #2e2f31;
@@ -117,7 +117,7 @@
 
 .artFallback {
   font-family: var(--font-hand), cursive;
-  font-size: 30px;
+  font-size: var(--fs-heading);
   line-height: 1.15;
   color: #fff;
   text-align: center;
@@ -125,7 +125,7 @@
 
 .cardName {
   font-family: var(--font-hand), cursive;
-  font-size: 32px;
+  font-size: var(--fs-heading);
   line-height: 1.1;
   color: #fff;
   border-bottom: 3px solid var(--card-accent);
@@ -135,7 +135,7 @@
 
 .quote {
   margin-top: 2px;
-  font-size: 20px;
+  font-size: var(--fs-body);
   color: #b6b4b0;
   font-style: italic;
   line-height: 1.6;
@@ -160,4 +160,16 @@
 
 .dot[data-active="true"] {
   background: var(--accent);
+}
+
+@media (max-width: 760px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .bigCard {
+    width: 86%;
+  }
 }

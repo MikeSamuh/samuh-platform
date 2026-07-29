@@ -60,7 +60,7 @@
   border: 1px solid var(--border);
   border-radius: 8px;
   color: var(--text);
-  font-size: 22px;
+  font-size: var(--fs-body);
   font-family: inherit;
   padding: 10px 12px;
   outline: none;
@@ -76,7 +76,7 @@
   border: none;
   border-radius: 8px;
   color: #fff;
-  font-size: 22px;
+  font-size: var(--fs-body);
   font-weight: 500;
   padding: 11px;
   cursor: pointer;
@@ -89,7 +89,7 @@
 
 .toggle {
   margin-top: 16px;
-  font-size: 20px;
+  font-size: var(--fs-body);
   color: var(--text-dim);
   text-align: center;
 }
@@ -98,7 +98,7 @@
   background: none;
   border: none;
   color: var(--accent);
-  font-size: 20px;
+  font-size: var(--fs-body);
   cursor: pointer;
   padding: 0;
 }
@@ -108,7 +108,7 @@
   border: 1px solid rgba(224, 64, 42, 0.4);
   color: #f0a396;
   border-radius: 8px;
-  font-size: 20px;
+  font-size: var(--fs-body);
   line-height: 1.5;
   padding: 9px 11px;
 }
@@ -118,7 +118,7 @@
   border: 1px solid rgba(59, 165, 93, 0.4);
   color: #9fd8b2;
   border-radius: 8px;
-  font-size: 20px;
+  font-size: var(--fs-body);
   line-height: 1.5;
   padding: 9px 11px;
 }

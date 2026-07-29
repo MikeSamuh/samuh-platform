@@ -14,12 +14,12 @@
 
 .wordmark {
   font-family: var(--font-serif), Georgia, serif;
-  font-size: 27px;
+  font-size: var(--fs-heading);
   color: var(--text);
 }
 
 .score {
-  font-size: 44px;
+  font-size: var(--fs-display);
   font-weight: 500;
   color: var(--text);
   margin-top: 8px;
@@ -27,7 +27,7 @@
 }
 
 .scoreUnit {
-  font-size: 20px;
+  font-size: var(--fs-body);
   color: var(--text-dim);
 }
 
@@ -45,7 +45,7 @@
 }
 
 .pointer {
-  font-size: 27px;
+  font-size: var(--fs-heading);
   font-weight: 500;
   color: var(--text);
 }
@@ -68,14 +68,14 @@
 }
 
 .tierLabel {
-  font-size: 20px;
+  font-size: var(--fs-body);
   color: #cfd0d2;
   margin-left: 8px;
   white-space: nowrap;
 }
 
 .loss {
-  font-size: 40px;
+  font-size: var(--fs-display);
   font-weight: 500;
   color: var(--text);
   margin-top: 8px;
@@ -83,6 +83,14 @@
 }
 
 .lossSub {
-  font-size: 20px;
+  font-size: var(--fs-body);
   color: var(--text-dim);
+}
+
+@media (max-width: 760px) {
+  .visual {
+    grid-template-columns: 1fr;
+    gap: 22px;
+    padding: 20px 14px;
+  }
 }

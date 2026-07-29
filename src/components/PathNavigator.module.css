@@ -72,3 +72,33 @@
 .step[data-locked="true"]:hover .dot {
   border-color: var(--text-faint);
 }
+
+@media (max-width: 760px) {
+  .nav {
+    padding: 20px 0 16px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .line {
+    left: 16px;
+    right: 16px;
+    top: 39px;
+  }
+
+  .steps {
+    min-width: max-content;
+    gap: 26px;
+    padding: 0 16px;
+    justify-content: flex-start;
+  }
+
+  .label {
+    font-size: var(--fs-body);
+    white-space: nowrap;
+  }
+}

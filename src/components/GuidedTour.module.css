@@ -18,7 +18,7 @@
 .popup {
   position: fixed;
   z-index: 92;
-  width: 380px;
+  width: 330px;
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 10px;
@@ -60,7 +60,7 @@
   background: none;
   border: none;
   color: var(--text-faint);
-  font-size: 20px;
+  font-size: var(--fs-body);
   cursor: pointer;
   padding: 0;
 }
@@ -79,7 +79,7 @@
   border: 1px solid var(--border);
   border-radius: 8px;
   color: var(--text);
-  font-size: 20px;
+  font-size: var(--fs-body);
   padding: 7px 12px;
   cursor: pointer;
 }
@@ -89,8 +89,15 @@
   border: none;
   border-radius: 8px;
   color: #fff;
-  font-size: 20px;
+  font-size: var(--fs-body);
   font-weight: 500;
   padding: 7px 14px;
   cursor: pointer;
+}
+
+@media (max-width: 760px) {
+  .popup {
+    width: calc(100vw - 24px);
+    left: 12px !important;
+  }
 }

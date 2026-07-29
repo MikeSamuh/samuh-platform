@@ -22,8 +22,15 @@ const caveat = Caveat({
 });
 
 export const metadata = {
-  title: "Samuh Platform",
+  title: "Ritualizer — Samuh",
   description: "Samuh team-journey app",
+};
+
+// Without this, phones render at a ~980px desktop width and zoom out.
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({ children }) {

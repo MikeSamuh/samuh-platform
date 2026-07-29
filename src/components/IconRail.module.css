@@ -75,7 +75,7 @@
 }
 
 .itemLabel {
-  font-size: 20px;
+  font-size: var(--fs-body);
   opacity: 0;
   transition: opacity 0.15s ease 0.05s;
 }
@@ -83,4 +83,24 @@
 .rail:hover .itemLabel,
 .rail:focus-within .itemLabel {
   opacity: 1;
+}
+
+@media (max-width: 760px) {
+  .railHolder {
+    width: 48px;
+  }
+
+  .rail {
+    width: 48px;
+    padding: 12px 6px;
+  }
+
+  .rail:hover,
+  .rail:focus-within {
+    width: 210px;
+  }
+
+  .itemIcon {
+    width: 34px;
+  }
 }
