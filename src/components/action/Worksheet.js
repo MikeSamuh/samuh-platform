@@ -82,7 +82,7 @@ function seedNotes(authors) {
   ];
 }
 
-export default function Worksheet({ members, currentMemberIndex, setCurrentMemberIndex }) {
+export default function Worksheet({ members, currentMemberIndex, setCurrentMemberIndex, onNoteAdded }) {
   const zoneRefs = useRef({});
   const offsetRef = useRef({ x: 0, y: 0 });
 
@@ -106,6 +106,7 @@ export default function Worksheet({ members, currentMemberIndex, setCurrentMembe
         color: author.color,
       },
     ]);
+    onNoteAdded?.();
   }
 
   function removeNote(id) {

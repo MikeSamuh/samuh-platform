@@ -1,15 +1,14 @@
 import BarChart from "@/components/awareness/BarChart";
-import Instructions from "@/components/Instructions";
+import Reflections from "@/components/awareness/Reflections";
 import AuthorPicker from "@/components/AuthorPicker";
+import MediaAccordion from "@/components/MediaAccordion";
+import TeamQVisual from "@/components/prepare/TeamQVisual";
+import CoachingCard from "@/components/CoachingCard";
 import { teamEnvironment, teamPractices } from "@/lib/awarenessData";
+import { awarenessMedia } from "@/lib/mediaContent";
+import { bookingLinks } from "@/lib/bookingLinks";
 import { getAuthors } from "@/lib/authors";
 import styles from "./Panel.module.css";
-
-const instructions = `
-1. Join peer-to-peer support.
-2. Communicate your results with your team.
-3. Understand your results.
-`;
 
 export default function AwarenessPanel({
   members = [],
@@ -17,14 +16,22 @@ export default function AwarenessPanel({
   setCurrentMemberIndex,
   votes = { environment: {}, practices: {} },
   castVote,
+  reflections,
+  addReflection,
+  completeTask,
 }) {
   const authors = getAuthors(members);
 
   return (
     <div className={styles.panel}>
+      <TeamQVisual />
+      <MediaAccordion
+        items={awarenessMedia}
+        onItemOpened={(id) => completeTask("awareness", id)}
+      />
       <AuthorPicker
         label="Vote as"
-        emptyLabel="Add team members on Discovery to vote"
+        emptyLabel="Add team members on Prepare to vote"
         authors={authors}
         value={currentMemberIndex}
         onChange={setCurrentMemberIndex}
@@ -45,7 +52,14 @@ export default function AwarenessPanel({
         votes={votes.practices}
         onVote={authors.length ? (label) => castVote("practices", label) : undefined}
       />
-      <Instructions markdown={instructions} />
+      <Reflections
+        authors={authors}
+        currentAuthorIndex={currentMemberIndex}
+        setCurrentAuthorIndex={setCurrentMemberIndex}
+        reflections={reflections}
+        onAdd={addReflection}
+      />
+      <CoachingCard href={bookingLinks.coachingCall} />
     </div>
   );
 }

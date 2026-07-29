@@ -63,3 +63,12 @@
   color: var(--text);
   font-weight: 600;
 }
+
+.step[data-locked="true"] {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.step[data-locked="true"]:hover .dot {
+  border-color: var(--text-faint);
+}

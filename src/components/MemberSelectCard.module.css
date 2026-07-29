@@ -1,0 +1,56 @@
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.iconBox {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: var(--chip);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  color: var(--accent-purple);
+}
+
+.title {
+  font-size: 14px;
+  color: var(--text);
+}
+
+.sub {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.select {
+  background: var(--inset);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 13px;
+  padding: 8px 11px;
+  outline: none;
+  cursor: pointer;
+  min-width: 170px;
+}
+
+.select:focus {
+  border-color: var(--accent);
+}

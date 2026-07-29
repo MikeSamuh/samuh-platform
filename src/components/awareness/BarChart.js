@@ -9,9 +9,10 @@ export default function BarChart({ title, rows, color, authors = [], votes = {},
       <div className={styles.title}>{title}</div>
       <div className={styles.rows}>
         {rows.map((row) => {
-          const voterIndices = Object.entries(votes)
+          const voters = Object.entries(votes)
             .filter(([, label]) => label === row.label)
-            .map(([idx]) => Number(idx));
+            .map(([id]) => authors.find((a) => a.id === id))
+            .filter(Boolean);
 
           return (
             <div key={row.label} className={styles.row}>
@@ -31,20 +32,20 @@ export default function BarChart({ title, rows, color, authors = [], votes = {},
                   onClick={() => onVote(row.label)}
                   aria-label={`Vote for ${row.label}`}
                   title={
-                    voterIndices.length
-                      ? `${voterIndices.length} vote${voterIndices.length > 1 ? "s" : ""}`
+                    voters.length
+                      ? `${voters.length} vote${voters.length > 1 ? "s" : ""}`
                       : "Place your star"
                   }
                 >
-                  {voterIndices.length === 0 && (
+                  {voters.length === 0 && (
                     <Star size={13} className={styles.voteGhost} />
                   )}
-                  {voterIndices.map((idx) => (
+                  {voters.map((voter) => (
                     <Star
-                      key={idx}
+                      key={voter.id}
                       size={13}
-                      fill={authors[idx]?.color || "currentColor"}
-                      color={authors[idx]?.color || "currentColor"}
+                      fill={voter.color}
+                      color={voter.color}
                     />
                   ))}
                 </button>

@@ -13,18 +13,29 @@ import styles from "./IconRail.module.css";
 
 const railIcons = [
   { id: "menu", icon: Menu, label: "Menu" },
-  { id: "dashboard", icon: LayoutDashboard, label: "Dashboard" },
+  { id: "dashboard", icon: LayoutDashboard, label: "Journey" },
   { id: "world", icon: Globe, label: "World" },
   { id: "shield", icon: Shield, label: "Shield" },
   { id: "frame", icon: Frame, label: "Frame" },
 ];
 
 const railIconsBottom = [
-  { id: "activity", icon: Activity, label: "Activity" },
+  { id: "activity", icon: Activity, label: "Team progress" },
   { id: "settings", icon: Settings, label: "Settings" },
 ];
 
-export default function IconRail() {
+export default function IconRail({ view = "journey", onSelectView }) {
+  function activeFor(id) {
+    if (id === "dashboard") return view === "journey";
+    if (id === "activity") return view === "admin";
+    return false;
+  }
+
+  function handleClick(id) {
+    if (id === "dashboard") onSelectView?.("journey");
+    if (id === "activity") onSelectView?.("admin");
+  }
+
   return (
     <nav className={styles.rail} aria-label="Primary">
       {railIcons.map(({ id, icon: Icon, label }) => (
@@ -32,9 +43,10 @@ export default function IconRail() {
           key={id}
           type="button"
           className={styles.iconButton}
-          data-active={id === "dashboard"}
+          data-active={activeFor(id)}
           aria-label={label}
           title={label}
+          onClick={() => handleClick(id)}
         >
           <Icon size={18} strokeWidth={1.75} />
         </button>
@@ -45,8 +57,11 @@ export default function IconRail() {
           key={id}
           type="button"
           className={styles.iconButton}
+          data-active={activeFor(id)}
+          data-tour={id === "activity" ? "admin" : undefined}
           aria-label={label}
           title={label}
+          onClick={() => handleClick(id)}
         >
           <Icon size={18} strokeWidth={1.75} />
         </button>

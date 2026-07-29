@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Claude Code machine-local settings (captures command lines; keep out of git)
+.claude/settings.local.json

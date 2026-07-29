@@ -1,5 +1,5 @@
 export const steps = [
-  { id: "discovery", label: "Discovery" },
+  { id: "prepare", label: "Prepare" },
   { id: "launch", label: "Launch" },
   { id: "awareness", label: "Awareness" },
   { id: "belonging", label: "Belonging" },

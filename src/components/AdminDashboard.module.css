@@ -1,0 +1,158 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 8px 48px 48px;
+  max-width: 960px;
+}
+
+.eyebrow {
+  font-size: 11px;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+.cardTitle {
+  font-size: 13px;
+  color: var(--text);
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+
+.stepRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+}
+
+.stepLabel {
+  width: 110px;
+  flex: none;
+  font-size: 12px;
+  color: var(--text);
+}
+
+.track {
+  flex: 1;
+  height: 8px;
+  background: var(--inset);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.fill[data-complete="true"] {
+  background: var(--band-thriving);
+}
+
+.stepCount {
+  flex: none;
+  font-size: 11px;
+  color: var(--text-dim);
+  width: 64px;
+  text-align: right;
+}
+
+.milestones {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 8px;
+}
+
+.milestone {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--inset);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.milestone[data-done="true"] {
+  color: var(--text);
+}
+
+.milestoneIcon {
+  flex: none;
+  color: var(--text-faint);
+}
+
+.milestone[data-done="true"] .milestoneIcon {
+  color: var(--band-thriving);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.table th {
+  text-align: left;
+  font-size: 10px;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.table td {
+  padding: 8px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-dim);
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.memberName {
+  color: var(--text);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.badge {
+  display: inline-block;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-radius: 8px;
+  padding: 1px 7px;
+  margin-left: 6px;
+  background: var(--chip);
+  color: var(--accent);
+}
+
+.check {
+  color: var(--band-thriving);
+}
+
+.dash {
+  color: var(--text-faint);
+}
+
+.empty {
+  font-size: 12px;
+  color: var(--text-faint);
+  padding: 6px 0;
+}
