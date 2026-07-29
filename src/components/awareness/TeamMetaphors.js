@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { metaphorCards } from "@/lib/metaphorCards";
+import { metaphorCards, parsePickDescription } from "@/lib/metaphorCards";
 import styles from "./TeamMetaphors.module.css";
 
 // The cards chosen on Launch, shown anonymously as a large card deck the team
@@ -22,11 +22,11 @@ export default function TeamMetaphors({ authors, picks }) {
 
   const entries = authors
     .filter((a) => picks[a.id])
-    .map((a) => ({
-      key: a.id,
-      card: metaphorCards.find((c) => c.id === picks[a.id].cardId),
-      description: picks[a.id].description,
-    }))
+    .map((a) => {
+      const card = metaphorCards.find((c) => c.id === picks[a.id].cardId);
+      const { name, why } = parsePickDescription(picks[a.id].description);
+      return { key: a.id, card, name: name || card?.name, why };
+    })
     .filter((e) => e.card);
 
   if (entries.length === 0) return null;
@@ -98,7 +98,7 @@ export default function TeamMetaphors({ authors, picks }) {
       </div>
 
       <div className={styles.track} ref={trackRef} onScroll={handleScroll}>
-        {entries.map(({ key, card, description }, i) => (
+        {entries.map(({ key, card, name, why }, i) => (
           <div
             key={key}
             className={styles.bigCard}
@@ -107,9 +107,8 @@ export default function TeamMetaphors({ authors, picks }) {
             onClick={() => scrollToCard(i)}
           >
             <span className={styles.emoji}>{card.emoji}</span>
-            <div className={styles.cardName}>{card.name}</div>
-            <div className={styles.blurb}>{card.blurb}</div>
-            {description && <div className={styles.quote}>“{description}”</div>}
+            {name && <div className={styles.cardName}>{name}</div>}
+            {why && <div className={styles.quote}>“{why}”</div>}
           </div>
         ))}
       </div>

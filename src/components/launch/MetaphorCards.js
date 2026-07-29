@@ -1,24 +1,46 @@
 "use client";
 
-import { metaphorCards } from "@/lib/metaphorCards";
+import { useState } from "react";
+import { Check } from "lucide-react";
+import { metaphorCards, parsePickDescription } from "@/lib/metaphorCards";
 import styles from "./MetaphorCards.module.css";
 
-export default function MetaphorCards({ authors, currentMember, picks, onPick, onDescribe }) {
-  const me = currentMember ? authors.find((a) => a.id === currentMember.id) : null;
-  const myPick = currentMember ? picks[currentMember.id] : null;
+// Image-only deck: pick the image that fits, give it your own name, say why,
+// and save. Picks surface anonymously in Awareness — no team list here.
+export default function MetaphorCards({ currentMember, picks, onSave }) {
+  const saved = currentMember ? picks[currentMember.id] : null;
+  const savedParsed = saved ? parsePickDescription(saved.description) : null;
+
+  const [cardId, setCardId] = useState(saved?.cardId || null);
+  const [name, setName] = useState(savedParsed?.name || "");
+  const [why, setWhy] = useState(savedParsed?.why || "");
+  const [justSaved, setJustSaved] = useState(false);
+
+  const selectedCard = metaphorCards.find((c) => c.id === cardId);
+  const dirty =
+    cardId &&
+    (cardId !== saved?.cardId || name !== (savedParsed?.name || "") || why !== (savedParsed?.why || ""));
+
+  async function handleSave() {
+    if (!currentMember || !cardId) return;
+    await onSave(currentMember.id, cardId, name, why);
+    setJustSaved(true);
+    setTimeout(() => setJustSaved(false), 2200);
+  }
 
   return (
     <div className={styles.wrap}>
       <div className={styles.header}>
         <span className={styles.title}>Metaphor cards</span>
-        {me && (
-          <span className={styles.you}>
-            Choosing as <strong style={{ color: me.color }}>{me.name}</strong>
+        {currentMember && saved && !dirty && (
+          <span className={styles.savedBadge}>
+            <Check size={13} />
+            Saved
           </span>
         )}
       </div>
       <div className={styles.sub}>
-        Pick the card that best describes your experience on this team, then say why.
+        Pick the image that best describes your experience on this team.
       </div>
 
       <div className={styles.deck}>
@@ -27,55 +49,54 @@ export default function MetaphorCards({ authors, currentMember, picks, onPick, o
             key={card.id}
             type="button"
             className={styles.cardButton}
-            data-selected={myPick?.cardId === card.id}
-            onClick={() => currentMember && onPick(currentMember.id, card.id)}
+            data-selected={cardId === card.id}
+            onClick={() => currentMember && setCardId(card.id)}
             disabled={!currentMember}
+            aria-label={card.name}
+            title={card.name}
           >
             <span className={styles.emoji}>{card.emoji}</span>
-            <span className={styles.cardName}>{card.name}</span>
-            <span className={styles.blurb}>{card.blurb}</span>
           </button>
         ))}
       </div>
 
-      {myPick && (
-        <div className={styles.describe}>
-          <label className={styles.describeLabel} htmlFor="card-desc">
-            Why does this card fit?
-          </label>
-          <textarea
-            id="card-desc"
-            className={styles.textarea}
-            placeholder="Describe the card you chose…"
-            value={myPick.description || ""}
-            onChange={(e) => onDescribe(currentMember.id, e.target.value)}
-          />
-        </div>
-      )}
-
-      {Object.keys(picks).length > 0 && (
-        <div className={styles.picks}>
-          <span className={styles.picksTitle}>Team picks</span>
-          {authors
-            .filter((a) => picks[a.id])
-            .map((a) => {
-              const card = metaphorCards.find((c) => c.id === picks[a.id].cardId);
-              if (!card) return null;
-              return (
-                <div key={a.id} className={styles.pick}>
-                  <span className={styles.pickEmoji}>{card.emoji}</span>
-                  <span>
-                    <span className={styles.pickName} style={{ color: a.color }}>
-                      {a.name}
-                    </span>{" "}
-                    <span className={styles.pickCard}>— {card.name}</span>
-                    {picks[a.id].description && (
-                      <div className={styles.pickDesc}>“{picks[a.id].description}”</div>
-                    )}
-                  </span>
-                </div>
-              );
-            })}
+      {selectedCard && (
+        <div className={styles.saveArea}>
+          <span className={styles.chosenEmoji}>{selectedCard.emoji}</span>
+          <div className={styles.saveFields}>
+            <div className={styles.field}>
+              <label className={styles.fieldLabel} htmlFor="card-name">
+                Name your card
+              </label>
+              <input
+                id="card-name"
+                className={styles.input}
+                placeholder="What would you call this?"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+            </div>
+            <div className={styles.field}>
+              <label className={styles.fieldLabel} htmlFor="card-why">
+                Why did you choose it?
+              </label>
+              <input
+                id="card-why"
+                className={styles.input}
+                placeholder="A few words is plenty"
+                value={why}
+                onChange={(e) => setWhy(e.target.value)}
+              />
+            </div>
+            <button
+              type="button"
+              className={styles.saveButton}
+              onClick={handleSave}
+              disabled={!dirty && !justSaved}
+            >
+              {justSaved ? "Saved" : saved ? "Update" : "Save"}
+            </button>
+          </div>
         </div>
       )}
     </div>

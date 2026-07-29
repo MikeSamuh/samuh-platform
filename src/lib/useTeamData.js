@@ -246,36 +246,26 @@ export function useTeamData(teamId, userId) {
       if (value) await actions.completeTask("launch", "launch-teamq");
     },
 
-    async pickCard(memberId, cardId) {
+    // One explicit save: the image they chose, the name they give it, and a
+    // few words on why. Name + why share the description column as JSON
+    // (schema change unavailable).
+    async saveCardPick(memberId, cardId, name, why) {
+      const description = JSON.stringify({ name: name.trim(), why: why.trim() });
       setData((d) => ({
         ...d,
-        cardPicks: {
-          ...d.cardPicks,
-          [memberId]: { cardId, description: d.cardPicks[memberId]?.description || "" },
-        },
+        cardPicks: { ...d.cardPicks, [memberId]: { cardId, description } },
       }));
       await supabase.from("card_picks").upsert(
         {
           team_id: teamId,
           member_id: memberId,
           card_id: cardId,
+          description,
           updated_at: new Date().toISOString(),
         },
         { onConflict: "team_id,member_id" }
       );
       await actions.completeTask("discover", "metaphor");
-    },
-
-    async describeCard(memberId, description) {
-      setData((d) => ({
-        ...d,
-        cardPicks: { ...d.cardPicks, [memberId]: { ...d.cardPicks[memberId], description } },
-      }));
-      await supabase
-        .from("card_picks")
-        .update({ description, updated_at: new Date().toISOString() })
-        .eq("team_id", teamId)
-        .eq("member_id", memberId);
     },
 
     async castVote(chartId, rowLabel) {
