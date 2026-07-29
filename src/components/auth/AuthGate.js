@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/AuthContext";
-import { supabaseConfigured } from "@/lib/supabaseClient";
-import AuthScreen from "./AuthScreen";
+import { supabase, supabaseConfigured } from "@/lib/supabaseClient";
+import { demoAccounts, DEFAULT_ROLE } from "@/lib/demoAccounts";
 import TeamSetup from "./TeamSetup";
 import styles from "./AuthScreen.module.css";
 
@@ -18,11 +18,24 @@ function Message({ title, body }) {
   );
 }
 
+// TESTING MODE: no login screen. Visitors are signed into a demo account
+// automatically; the header dropdown switches between user types.
 export default function AuthGate({ children }) {
   const { session, profile, profileMissing, loading, isStaff, signOut } = useAuth();
+  const [autoError, setAutoError] = useState(null);
+
+  useEffect(() => {
+    if (!supabaseConfigured || loading || session) return;
+    const account = demoAccounts[DEFAULT_ROLE];
+    supabase.auth
+      .signInWithPassword({ email: account.email, password: account.password })
+      .then(({ error }) => {
+        if (error) setAutoError(error.message);
+      });
+  }, [loading, session]);
 
   // A session whose profile no longer exists (deleted user, wiped database)
-  // would otherwise leave the app stuck on a blank screen forever.
+  // would otherwise leave the app stuck; sign out and let auto-login retry.
   useEffect(() => {
     if (session && profileMissing) signOut();
   }, [session, profileMissing, signOut]);
@@ -36,10 +49,18 @@ export default function AuthGate({ children }) {
     );
   }
 
-  if (loading) return <Message title="Loading…" body="Getting your team journey ready." />;
-  if (!session) return <AuthScreen />;
-  if (profileMissing) return <Message title="Signing out…" body="That account no longer exists." />;
-  if (!profile) return <Message title="Loading…" body="Getting your team journey ready." />;
+  if (autoError) {
+    return (
+      <Message
+        title="Couldn't start the demo session"
+        body={`Automatic sign-in failed: ${autoError}`}
+      />
+    );
+  }
+
+  if (loading || !session || !profile) {
+    return <Message title="Loading…" body="Getting your team journey ready." />;
+  }
 
   // Samuh staff work across teams and never belong to one.
   if (!profile.team_id && !isStaff) return <TeamSetup />;

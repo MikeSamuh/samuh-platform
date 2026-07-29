@@ -15,35 +15,41 @@ export default function LaunchPanel({ team, currentMember, completeTask }) {
 
   return (
     <div className={panelStyles.panel}>
-      <MediaAccordion
-        items={launchMedia}
-        onItemOpened={(id) => completeTask("launch", id)}
-      />
+      <div data-tour="media">
+        <MediaAccordion
+          items={launchMedia}
+          onItemOpened={(id) => completeTask("launch", id)}
+        />
+      </div>
 
-      {team.launched ? (
-        <div className={styles.status}>
-          TeamQ+ launched &middot; {team.members.length} of {team.members.length} invited, 0
-          responded
-        </div>
-      ) : (
-        <button
-          type="button"
-          className={styles.launchButton}
-          onClick={() => team.setLaunched(true)}
-          disabled={team.members.length === 0}
-        >
-          <Play size={16} />
-          Launch TeamQ+
-        </button>
-      )}
+      <div data-tour="launch">
+        {team.launched ? (
+          <div className={styles.status}>
+            TeamQ+ launched &middot; {team.members.length} of {team.members.length} invited, 0
+            responded
+          </div>
+        ) : (
+          <button
+            type="button"
+            className={styles.launchButton}
+            onClick={() => team.setLaunched(true)}
+            disabled={team.members.length === 0}
+          >
+            <Play size={16} />
+            Launch TeamQ+
+          </button>
+        )}
+      </div>
 
-      <MetaphorCards
-        authors={authors}
-        currentMember={currentMember}
-        picks={team.cardPicks}
-        onPick={team.pickCard}
-        onDescribe={team.describeCard}
-      />
+      <div data-tour="metaphor">
+        <MetaphorCards
+          authors={authors}
+          currentMember={currentMember}
+          picks={team.cardPicks}
+          onPick={team.pickCard}
+          onDescribe={team.describeCard}
+        />
+      </div>
 
       <CoachingCard
         sub="Book on the Samuh teams Google Calendar"

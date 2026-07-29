@@ -3,63 +3,38 @@
 import { useEffect, useLayoutEffect, useState } from "react";
 import styles from "./GuidedTour.module.css";
 
-const TOUR_STEPS = [
-  {
-    target: "path",
-    title: "Your team journey",
-    body: "Five steps: Prepare, Launch, Awareness, Belonging, Action. Finish a step's tasks to unlock the next one — you can always go back.",
-  },
-  {
-    target: "checklist",
-    title: "Step tasks",
-    body: "Everything to do on this step lives here. Tasks check themselves off as you watch, read, and complete each module.",
-  },
-  {
-    target: "media",
-    title: "Watch, read, listen",
-    body: "Each step has videos, guides, and recordings. Open a tile to play it — that counts as completing the task.",
-  },
-  {
-    target: "members",
-    title: "Your team",
-    body: "Add teammates with their name, email, and tenure — one at a time, or upload a spreadsheet (there's a template to download).",
-  },
-  {
-    target: "colead",
-    title: "Pick a co-lead",
-    body: "Once your team is in, choose a co-lead to share the journey with you.",
-  },
-  {
-    target: "admin",
-    title: "Track progress",
-    body: "The activity icon opens the team progress dashboard — step completion, milestones, and who's participated.",
-  },
-];
-
 function getRect(target) {
   const el = document.querySelector(`[data-tour="${target}"]`);
   if (!el) return null;
   return el.getBoundingClientRect();
 }
 
-export default function GuidedTour({ onClose, onComplete }) {
-  // Some targets only exist for certain roles (e.g. the admin icon), so tour
-  // only the stops actually on screen.
+export default function GuidedTour({ stops, onClose, onComplete }) {
+  // Some targets only exist for certain roles (e.g. the admin icon, the team
+  // name card), so tour only the stops actually on screen.
   const [tourSteps] = useState(() =>
-    TOUR_STEPS.filter((s) => document.querySelector(`[data-tour="${s.target}"]`))
+    stops.filter((s) => document.querySelector(`[data-tour="${s.target}"]`))
   );
   const [index, setIndex] = useState(0);
   const [rect, setRect] = useState(null);
 
-  const step = tourSteps[index];
+  const step = tourSteps[index] || null;
+
+  // Nothing on screen to tour (shouldn't happen, but never crash a step).
+  useEffect(() => {
+    if (tourSteps.length === 0) onComplete();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useLayoutEffect(() => {
+    if (!step) return;
     const el = document.querySelector(`[data-tour="${step.target}"]`);
     if (el) el.scrollIntoView({ block: "center", behavior: "instant" });
     setRect(getRect(step.target));
-  }, [step.target]);
+  }, [step?.target]);
 
   useEffect(() => {
+    if (!step) return;
     function update() {
       setRect(getRect(step.target));
     }
@@ -69,7 +44,9 @@ export default function GuidedTour({ onClose, onComplete }) {
       window.removeEventListener("resize", update);
       window.removeEventListener("scroll", update, true);
     };
-  }, [step.target]);
+  }, [step?.target]);
+
+  if (!step) return null;
 
   function handleNext() {
     if (index === tourSteps.length - 1) {

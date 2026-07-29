@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { steps } from "@/lib/steps";
 import { stepTasks } from "@/lib/stepTasks";
+import { tours } from "@/lib/tours";
 import { useAuth } from "@/lib/AuthContext";
 import { useTeamData } from "@/lib/useTeamData";
 import IconRail from "@/components/IconRail";
@@ -12,6 +13,8 @@ import StepChecklist from "@/components/StepChecklist";
 import AdminDashboard from "@/components/AdminDashboard";
 import GuidedTour from "@/components/GuidedTour";
 import TeamName from "@/components/TeamName";
+import TourCard from "@/components/TourCard";
+import RoleSwitcher from "@/components/RoleSwitcher";
 import PreparePanel from "@/components/panels/PreparePanel";
 import LaunchPanel from "@/components/panels/LaunchPanel";
 import AwarenessPanel from "@/components/panels/AwarenessPanel";
@@ -28,18 +31,25 @@ const panels = {
 };
 
 export default function AppShell() {
-  const { profile, isStaff, isManager, signOut } = useAuth();
+  const { profile, isStaff, isManager } = useAuth();
   const team = useTeamData(profile?.team_id, profile?.id);
 
   const [activeStepId, setActiveStepId] = useState(steps[0].id);
-  const [view, setView] = useState(isStaff ? "admin" : "journey");
+  const [view, setView] = useState("journey");
   const [tourActive, setTourActive] = useState(false);
 
   const ActivePanel = panels[activeStepId];
+  const activeStep = steps.find((s) => s.id === activeStepId);
+
+  // Staff land on the dashboard; switching roles resets the view sensibly.
+  useEffect(() => {
+    setView(isStaff ? "admin" : "journey");
+    setTourActive(false);
+  }, [isStaff, profile?.id]);
 
   // Advance whenever the active step's checklist fills up, no matter which
   // path completed the last task (checkbox, media open, co-lead select,
-  // team rename — the last three complete tasks inside the data layer).
+  // team rename — several complete tasks inside the data layer).
   useEffect(() => {
     if (view !== "journey" || team.loading) return;
     if (!team.isStepComplete(activeStepId)) return;
@@ -73,25 +83,22 @@ export default function AppShell() {
       <IconRail view={view} onSelectView={setView} showAdmin={isStaff} />
       <div className={styles.main}>
         <div className={styles.header}>
-          <Image
-            src="/samuh-logo.png"
-            alt="Samuh"
-            width={140}
-            height={45}
-            className={styles.logo}
-            priority
-          />
+          <div className={styles.brand}>
+            <Image
+              src="/samuh-logo.png"
+              alt="Samuh"
+              width={140}
+              height={45}
+              className={styles.logo}
+              priority
+            />
+            <span className={styles.appTitle}>Ritualizer</span>
+          </div>
           <div className={styles.account}>
             {!isStaff && (
               <TeamName team={team.team} canRename={isManager} onRename={team.renameTeam} />
             )}
-            <span className={styles.accountName}>
-              {profile?.full_name || profile?.email}
-              {isStaff && <span className={styles.staffBadge}>Samuh</span>}
-            </span>
-            <button type="button" className={styles.signOut} onClick={signOut}>
-              Sign out
-            </button>
+            <RoleSwitcher currentRole={profile?.role} />
           </div>
         </div>
 
@@ -110,11 +117,11 @@ export default function AppShell() {
           // Samuh staff belong to no team, so the journey has nothing to read
           // or write. Say so instead of showing an empty, silently-failing form.
           <div className={styles.staffNotice}>
-            <div className={styles.staffNoticeTitle}>You&apos;re signed in as Samuh staff</div>
+            <div className={styles.staffNoticeTitle}>You&apos;re viewing as Samuh Admin</div>
             <p className={styles.staffNoticeBody}>
               Staff accounts aren&apos;t part of any client team, so there&apos;s no journey to
               fill in here. Use the team progress dashboard to see how every client team is
-              doing. To walk the journey yourself, sign in with a manager or member account.
+              doing, or switch to Manager or Team Member in the dropdown to walk the journey.
             </p>
             <button
               type="button"
@@ -133,11 +140,17 @@ export default function AppShell() {
             />
             <div className={styles.stepBody}>
               <div className={styles.stepMain}>
+                <div className={styles.tourSlot}>
+                  <TourCard
+                    stepLabel={activeStep?.label}
+                    onStart={() => setTourActive(true)}
+                    completed={(team.taskChecks[activeStepId] || []).includes("tour")}
+                  />
+                </div>
                 <ActivePanel
                   team={team}
                   currentMember={team.currentMember}
                   completeTask={completeTask}
-                  startTour={() => setTourActive(true)}
                   canManage={isManager}
                 />
               </div>
@@ -155,10 +168,11 @@ export default function AppShell() {
       </div>
       {tourActive && (
         <GuidedTour
+          stops={tours[activeStepId] || []}
           onClose={() => setTourActive(false)}
           onComplete={() => {
             setTourActive(false);
-            completeTask("prepare", "tour");
+            completeTask(activeStepId, "tour");
           }}
         />
       )}

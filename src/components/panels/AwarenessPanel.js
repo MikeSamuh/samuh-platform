@@ -16,32 +16,40 @@ export default function AwarenessPanel({ team, currentMember, completeTask }) {
 
   return (
     <div className={styles.panel}>
-      <TeamQVisual />
-      <MediaAccordion
-        items={awarenessMedia}
-        onItemOpened={(id) => completeTask("awareness", id)}
-      />
-      <BarChart
-        title="Team environment"
-        rows={teamEnvironment}
-        color="var(--chart-pink)"
-        authors={authors}
-        votes={team.votes.environment}
-        onVote={currentMember ? (label) => team.castVote("environment", label) : undefined}
-      />
-      <BarChart
-        title="Team practices"
-        rows={teamPractices}
-        color="var(--chart-teal)"
-        authors={authors}
-        votes={team.votes.practices}
-        onVote={currentMember ? (label) => team.castVote("practices", label) : undefined}
-      />
-      <Reflections
-        reflections={team.reflections}
-        onAdd={team.addReflection}
-        canPost={Boolean(currentMember)}
-      />
+      <div data-tour="teamq">
+        <TeamQVisual />
+      </div>
+      <div data-tour="media">
+        <MediaAccordion
+          items={awarenessMedia}
+          onItemOpened={(id) => completeTask("awareness", id)}
+        />
+      </div>
+      <div data-tour="charts" className={styles.panel} style={{ padding: 0 }}>
+        <BarChart
+          title="Team environment"
+          rows={teamEnvironment}
+          color="var(--chart-pink)"
+          authors={authors}
+          votes={team.votes.environment}
+          onVote={currentMember ? (label) => team.castVote("environment", label) : undefined}
+        />
+        <BarChart
+          title="Team practices"
+          rows={teamPractices}
+          color="var(--chart-teal)"
+          authors={authors}
+          votes={team.votes.practices}
+          onVote={currentMember ? (label) => team.castVote("practices", label) : undefined}
+        />
+      </div>
+      <div data-tour="reflections">
+        <Reflections
+          reflections={team.reflections}
+          onAdd={team.addReflection}
+          canPost={Boolean(currentMember)}
+        />
+      </div>
       <CoachingCard href={bookingLinks.coachingCall} />
     </div>
   );

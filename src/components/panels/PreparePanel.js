@@ -5,26 +5,25 @@ import MediaAccordion from "@/components/MediaAccordion";
 import MemberSelectCard from "@/components/MemberSelectCard";
 import TeamMembers from "@/components/prepare/TeamMembers";
 import TeamNameCard from "@/components/prepare/TeamNameCard";
-import TourCard from "@/components/prepare/TourCard";
 import CoachingCard from "@/components/CoachingCard";
 import { prepareMedia } from "@/lib/mediaContent";
 import { bookingLinks } from "@/lib/bookingLinks";
 import styles from "./Panel.module.css";
 
-export default function PreparePanel({ team, completeTask, startTour, canManage }) {
+export default function PreparePanel({ team, completeTask, canManage }) {
   return (
     <div className={styles.panel}>
-      {canManage && <TeamNameCard team={team.team} onRename={team.renameTeam} />}
+      {canManage && (
+        <div data-tour="team-name">
+          <TeamNameCard team={team.team} onRename={team.renameTeam} />
+        </div>
+      )}
       <div data-tour="media">
         <MediaAccordion
           items={prepareMedia}
           onItemOpened={(id) => completeTask("prepare", id)}
         />
       </div>
-      <TourCard
-        onStart={startTour}
-        completed={(team.taskChecks.prepare || []).includes("tour")}
-      />
       <div data-tour="members">
         <TeamMembers
           members={team.members}
