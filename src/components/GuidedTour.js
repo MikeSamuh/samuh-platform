@@ -43,10 +43,15 @@ function getRect(target) {
 }
 
 export default function GuidedTour({ onClose, onComplete }) {
+  // Some targets only exist for certain roles (e.g. the admin icon), so tour
+  // only the stops actually on screen.
+  const [tourSteps] = useState(() =>
+    TOUR_STEPS.filter((s) => document.querySelector(`[data-tour="${s.target}"]`))
+  );
   const [index, setIndex] = useState(0);
   const [rect, setRect] = useState(null);
 
-  const step = TOUR_STEPS[index];
+  const step = tourSteps[index];
 
   useLayoutEffect(() => {
     const el = document.querySelector(`[data-tour="${step.target}"]`);
@@ -67,7 +72,7 @@ export default function GuidedTour({ onClose, onComplete }) {
   }, [step.target]);
 
   function handleNext() {
-    if (index === TOUR_STEPS.length - 1) {
+    if (index === tourSteps.length - 1) {
       onComplete();
     } else {
       setIndex(index + 1);
@@ -99,7 +104,7 @@ export default function GuidedTour({ onClose, onComplete }) {
       <div className={styles.highlight} style={highlightStyle} />
       <div className={styles.popup} style={{ top: popupTop, left: popupLeft }}>
         <div className={styles.stepCount}>
-          {index + 1} of {TOUR_STEPS.length}
+          {index + 1} of {tourSteps.length}
         </div>
         <div className={styles.popupTitle}>{step.title}</div>
         <div className={styles.popupBody}>{step.body}</div>
@@ -114,7 +119,7 @@ export default function GuidedTour({ onClose, onComplete }) {
               </button>
             )}
             <button type="button" className={styles.next} onClick={handleNext}>
-              {index === TOUR_STEPS.length - 1 ? "Finish tour" : "Next"}
+              {index === tourSteps.length - 1 ? "Finish tour" : "Next"}
             </button>
           </div>
         </div>

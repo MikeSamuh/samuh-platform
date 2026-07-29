@@ -24,7 +24,7 @@ const railIconsBottom = [
   { id: "settings", icon: Settings, label: "Settings" },
 ];
 
-export default function IconRail({ view = "journey", onSelectView }) {
+export default function IconRail({ view = "journey", onSelectView, showAdmin = false }) {
   function activeFor(id) {
     if (id === "dashboard") return view === "journey";
     if (id === "activity") return view === "admin";
@@ -52,20 +52,22 @@ export default function IconRail({ view = "journey", onSelectView }) {
         </button>
       ))}
       <div className={styles.spacer} />
-      {railIconsBottom.map(({ id, icon: Icon, label }) => (
-        <button
-          key={id}
-          type="button"
-          className={styles.iconButton}
-          data-active={activeFor(id)}
-          data-tour={id === "activity" ? "admin" : undefined}
-          aria-label={label}
-          title={label}
-          onClick={() => handleClick(id)}
-        >
-          <Icon size={18} strokeWidth={1.75} />
-        </button>
-      ))}
+      {railIconsBottom
+        .filter(({ id }) => id !== "activity" || showAdmin)
+        .map(({ id, icon: Icon, label }) => (
+          <button
+            key={id}
+            type="button"
+            className={styles.iconButton}
+            data-active={activeFor(id)}
+            data-tour={id === "activity" ? "admin" : undefined}
+            aria-label={label}
+            title={label}
+            onClick={() => handleClick(id)}
+          >
+            <Icon size={18} strokeWidth={1.75} />
+          </button>
+        ))}
     </nav>
   );
 }

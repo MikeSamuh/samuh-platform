@@ -10,18 +10,8 @@ import { getAuthors } from "@/lib/authors";
 import panelStyles from "./Panel.module.css";
 import styles from "./LaunchPanel.module.css";
 
-export default function LaunchPanel({
-  members = [],
-  launched,
-  setLaunched,
-  currentMemberIndex,
-  setCurrentMemberIndex,
-  cardPicks,
-  pickCard,
-  describeCard,
-  completeTask,
-}) {
-  const authors = getAuthors(members);
+export default function LaunchPanel({ team, currentMember, completeTask }) {
+  const authors = getAuthors(team.members);
 
   return (
     <div className={panelStyles.panel}>
@@ -30,16 +20,17 @@ export default function LaunchPanel({
         onItemOpened={(id) => completeTask("launch", id)}
       />
 
-      {launched ? (
+      {team.launched ? (
         <div className={styles.status}>
-          TeamQ+ launched &middot; {members.length} of {members.length} invited, 0 responded
+          TeamQ+ launched &middot; {team.members.length} of {team.members.length} invited, 0
+          responded
         </div>
       ) : (
         <button
           type="button"
           className={styles.launchButton}
-          onClick={() => setLaunched(true)}
-          disabled={members.length === 0}
+          onClick={() => team.setLaunched(true)}
+          disabled={team.members.length === 0}
         >
           <Play size={16} />
           Launch TeamQ+
@@ -48,11 +39,10 @@ export default function LaunchPanel({
 
       <MetaphorCards
         authors={authors}
-        currentAuthorIndex={currentMemberIndex}
-        setCurrentAuthorIndex={setCurrentMemberIndex}
-        picks={cardPicks}
-        onPick={pickCard}
-        onDescribe={describeCard}
+        currentMember={currentMember}
+        picks={team.cardPicks}
+        onPick={team.pickCard}
+        onDescribe={team.describeCard}
       />
 
       <CoachingCard

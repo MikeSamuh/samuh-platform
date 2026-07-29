@@ -175,3 +175,8 @@
   min-height: 20px;
   cursor: text;
 }
+
+.postAsLabel {
+  font-size: 11px;
+  color: var(--text-dim);
+}

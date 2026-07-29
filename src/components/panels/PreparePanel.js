@@ -10,16 +10,7 @@ import { prepareMedia } from "@/lib/mediaContent";
 import { bookingLinks } from "@/lib/bookingLinks";
 import styles from "./Panel.module.css";
 
-export default function PreparePanel({
-  members,
-  addMember,
-  removeMember,
-  coLead,
-  setCoLead,
-  completeTask,
-  taskChecks = {},
-  startTour,
-}) {
+export default function PreparePanel({ team, completeTask, startTour }) {
   return (
     <div className={styles.panel}>
       <div data-tour="media">
@@ -30,19 +21,23 @@ export default function PreparePanel({
       </div>
       <TourCard
         onStart={startTour}
-        completed={(taskChecks.prepare || []).includes("tour")}
+        completed={(team.taskChecks.prepare || []).includes("tour")}
       />
       <div data-tour="members">
-        <TeamMembers members={members} onAdd={addMember} onRemove={removeMember} />
+        <TeamMembers
+          members={team.members}
+          onAdd={team.addMember}
+          onRemove={team.removeMember}
+        />
       </div>
       <div data-tour="colead">
         <MemberSelectCard
           icon={UserCheck}
           title="Identify a co-lead"
           sub="Now that your team is in, pick your co-lead"
-          members={members}
-          value={coLead}
-          onChange={setCoLead}
+          members={team.members}
+          value={team.coLead}
+          onChange={team.setCoLead}
         />
       </div>
       <CoachingCard href={bookingLinks.coachingCall} />

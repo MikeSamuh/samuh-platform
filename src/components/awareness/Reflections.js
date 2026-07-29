@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import AuthorPicker from "@/components/AuthorPicker";
 import { MEMBER_COLORS } from "@/lib/colors";
 import styles from "./Reflections.module.css";
 
@@ -20,27 +19,18 @@ function buildCloud(reflections) {
       counts.set(word, (counts.get(word) || 0) + 1);
     }
   }
-  return [...counts.entries()]
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 40);
+  return [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 40);
 }
 
-export default function Reflections({
-  authors,
-  currentAuthorIndex,
-  setCurrentAuthorIndex,
-  reflections,
-  onAdd,
-}) {
+export default function Reflections({ reflections, onAdd, canPost }) {
   const [text, setText] = useState("");
-  const author = authors[Math.min(currentAuthorIndex, authors.length - 1)] || null;
   const cloud = buildCloud(reflections);
   const maxCount = cloud.length ? cloud[0][1] : 1;
 
   function handlePost() {
     const trimmed = text.trim();
-    if (!trimmed || !author) return;
-    onAdd({ authorId: author.id, text: trimmed });
+    if (!trimmed || !canPost) return;
+    onAdd(trimmed);
     setText("");
   }
 
@@ -48,13 +38,6 @@ export default function Reflections({
     <div className={styles.wrap}>
       <div className={styles.header}>
         <span className={styles.title}>Notes &amp; reflections</span>
-        <AuthorPicker
-          label="Posting as"
-          emptyLabel="Add team members on Prepare first"
-          authors={authors}
-          value={currentAuthorIndex}
-          onChange={setCurrentAuthorIndex}
-        />
       </div>
       <div className={styles.sub}>
         Share notes or feedback from your sessions — reflections are anonymous, and
@@ -67,14 +50,14 @@ export default function Reflections({
           placeholder="What surfaced for you?"
           value={text}
           onChange={(e) => setText(e.target.value)}
-          disabled={!author}
+          disabled={!canPost}
           rows={4}
         />
         <button
           type="button"
           className={styles.postButton}
           onClick={handlePost}
-          disabled={!author || !text.trim()}
+          disabled={!canPost || !text.trim()}
         >
           Post
         </button>

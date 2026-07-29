@@ -1,31 +1,21 @@
 "use client";
 
 import { metaphorCards } from "@/lib/metaphorCards";
-import AuthorPicker from "@/components/AuthorPicker";
 import styles from "./MetaphorCards.module.css";
 
-export default function MetaphorCards({
-  authors,
-  currentAuthorIndex,
-  setCurrentAuthorIndex,
-  picks,
-  onPick,
-  onDescribe,
-}) {
-  const author = authors[Math.min(currentAuthorIndex, authors.length - 1)] || null;
-  const myPick = author ? picks[author.id] : null;
+export default function MetaphorCards({ authors, currentMember, picks, onPick, onDescribe }) {
+  const me = currentMember ? authors.find((a) => a.id === currentMember.id) : null;
+  const myPick = currentMember ? picks[currentMember.id] : null;
 
   return (
     <div className={styles.wrap}>
       <div className={styles.header}>
         <span className={styles.title}>Metaphor cards</span>
-        <AuthorPicker
-          label="Choosing as"
-          emptyLabel="Add team members on Prepare first"
-          authors={authors}
-          value={currentAuthorIndex}
-          onChange={setCurrentAuthorIndex}
-        />
+        {me && (
+          <span className={styles.you}>
+            Choosing as <strong style={{ color: me.color }}>{me.name}</strong>
+          </span>
+        )}
       </div>
       <div className={styles.sub}>
         Pick the card that best describes your experience on this team, then say why.
@@ -38,8 +28,8 @@ export default function MetaphorCards({
             type="button"
             className={styles.cardButton}
             data-selected={myPick?.cardId === card.id}
-            onClick={() => author && onPick(author.id, card.id)}
-            disabled={!author}
+            onClick={() => currentMember && onPick(currentMember.id, card.id)}
+            disabled={!currentMember}
           >
             <span className={styles.emoji}>{card.emoji}</span>
             <span className={styles.cardName}>{card.name}</span>
@@ -51,14 +41,14 @@ export default function MetaphorCards({
       {myPick && (
         <div className={styles.describe}>
           <label className={styles.describeLabel} htmlFor="card-desc">
-            Why does this card fit, {author.name}?
+            Why does this card fit?
           </label>
           <textarea
             id="card-desc"
             className={styles.textarea}
             placeholder="Describe the card you chose…"
             value={myPick.description || ""}
-            onChange={(e) => onDescribe(author.id, e.target.value)}
+            onChange={(e) => onDescribe(currentMember.id, e.target.value)}
           />
         </div>
       )}

@@ -1,18 +1,11 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { Plus, X, Users } from "lucide-react";
-import { getAuthors } from "@/lib/authors";
-import AuthorPicker from "@/components/AuthorPicker";
 import styles from "./Worksheet.module.css";
 
 const SECTIONS = [
-  {
-    id: "what",
-    label: "What",
-    area: "what",
-    hint: "What is this practice or ritual?",
-  },
+  { id: "what", label: "What", area: "what", hint: "What is this practice or ritual?" },
   {
     id: "why",
     label: "Why",
@@ -32,92 +25,41 @@ const SECTIONS = [
     icon: Users,
     hint: "Who attends, and who facilitates or owns it.",
   },
-  {
-    id: "how",
-    label: "How",
-    area: "how",
-    hint: "Step by step instructions, key elements.",
-  },
-  {
-    id: "prep",
-    label: "Prep",
-    area: "prep",
-    hint: "How to set it up, what to do before.",
-  },
+  { id: "how", label: "How", area: "how", hint: "Step by step instructions, key elements." },
+  { id: "prep", label: "Prep", area: "prep", hint: "How to set it up, what to do before." },
 ];
 
 const NOTE_WIDTH = 130;
 
-function seedNotes(authors) {
-  if (authors.length === 0) return [];
-  const pick = (i) => authors[i % authors.length];
-  return [
-    {
-      id: "seed-what",
-      section: "what",
-      text: "Friday retro — 15 min, whole team",
-      x: 12,
-      y: 10,
-      author: pick(0).name,
-      color: pick(0).color,
-    },
-    {
-      id: "seed-why",
-      section: "why",
-      text: "Keep decisions visible before they're forgotten",
-      x: 12,
-      y: 10,
-      author: pick(1).name,
-      color: pick(1).color,
-    },
-    {
-      id: "seed-when",
-      section: "when",
-      text: "Every Friday, 4pm — triggered by sprint close",
-      x: 12,
-      y: 10,
-      author: pick(2).name,
-      color: pick(2).color,
-    },
-  ];
-}
-
-export default function Worksheet({ members, currentMemberIndex, setCurrentMemberIndex, onNoteAdded }) {
+export default function Worksheet({
+  authors,
+  currentMember,
+  notes,
+  onAddNote,
+  onUpdateNote,
+  onRemoveNote,
+}) {
   const zoneRefs = useRef({});
   const offsetRef = useRef({ x: 0, y: 0 });
 
-  const authors = getAuthors(members);
-  const [notes, setNotes] = useState(() => seedNotes(authors));
+  const me = currentMember ? authors.find((a) => a.id === currentMember.id) : null;
 
-  const author = authors[Math.min(currentMemberIndex, authors.length - 1)] || null;
-
-  function handleAddNote() {
-    if (!author) return;
-    const id = `note-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
-    setNotes((prev) => [
-      ...prev,
-      {
-        id,
-        section: "what",
-        text: "New idea",
-        x: 12,
-        y: 10 + Math.random() * 40,
-        author: author.name,
-        color: author.color,
-      },
-    ]);
-    onNoteAdded?.();
+  function authorFor(note) {
+    return authors.find((a) => a.id === note.member_id);
   }
 
-  function removeNote(id) {
-    setNotes((prev) => prev.filter((note) => note.id !== id));
+  function handleAdd() {
+    if (!currentMember) return;
+    onAddNote({
+      section: "what",
+      x: 12,
+      y: 10 + Math.random() * 40,
+      text: "New idea",
+      color: me?.color || null,
+    });
   }
 
-  function commitText(id, text) {
-    setNotes((prev) => prev.map((note) => (note.id === id ? { ...note, text } : note)));
-  }
-
-  function handleNotePointerDown(e, note) {
+  function handlePointerDown(e) {
     const rect = e.currentTarget.getBoundingClientRect();
     offsetRef.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
     e.currentTarget.setPointerCapture(e.pointerId);
@@ -125,7 +67,7 @@ export default function Worksheet({ members, currentMemberIndex, setCurrentMembe
     e.currentTarget.style.zIndex = "10";
   }
 
-  function handleNotePointerMove(e, note) {
+  function handlePointerMove(e, note) {
     if (e.currentTarget.dataset.dragging !== "true") return;
 
     let targetId = note.section;
@@ -153,14 +95,32 @@ export default function Worksheet({ members, currentMemberIndex, setCurrentMembe
     );
     const y = Math.max(4, e.clientY - targetRect.top - offsetRef.current.y);
 
-    setNotes((prev) =>
-      prev.map((n) => (n.id === note.id ? { ...n, section: targetId, x, y } : n))
-    );
+    // Move locally while dragging; persist once on release.
+    const el = e.currentTarget;
+    el.style.left = `${x}px`;
+    el.style.top = `${y}px`;
+    el.dataset.pendingSection = targetId;
+    el.dataset.pendingX = String(x);
+    el.dataset.pendingY = String(y);
+
+    const zone = zoneRefs.current[targetId];
+    if (zone && el.parentElement !== zone) zone.appendChild(el);
   }
 
-  function handleNotePointerUp(e) {
-    e.currentTarget.dataset.dragging = "false";
-    e.currentTarget.style.zIndex = "1";
+  function handlePointerUp(e, note) {
+    const el = e.currentTarget;
+    if (el.dataset.dragging !== "true") return;
+    el.dataset.dragging = "false";
+    el.style.zIndex = "1";
+
+    const section = el.dataset.pendingSection;
+    if (!section) return;
+    onUpdateNote(note.id, {
+      section,
+      x: Number(el.dataset.pendingX),
+      y: Number(el.dataset.pendingY),
+    });
+    delete el.dataset.pendingSection;
   }
 
   return (
@@ -168,18 +128,20 @@ export default function Worksheet({ members, currentMemberIndex, setCurrentMembe
       <div className={styles.header}>
         <span className={styles.eyebrow}>Action &middot; collective worksheet</span>
         <div className={styles.headerActions}>
-          <AuthorPicker
-            label="Post as"
-            emptyLabel="Add team members on Discovery to post notes"
-            authors={authors}
-            value={currentMemberIndex}
-            onChange={setCurrentMemberIndex}
-          />
+          {me ? (
+            <span className={styles.postAsLabel}>
+              Posting as <strong style={{ color: me.color }}>{me.name}</strong>
+            </span>
+          ) : (
+            <span className={styles.postAsLabel}>
+              Ask your manager to add you to the roster to post
+            </span>
+          )}
           <button
             type="button"
             className={styles.addButton}
-            onClick={handleAddNote}
-            disabled={!author}
+            onClick={handleAdd}
+            disabled={!currentMember}
           >
             <Plus size={14} />
             Add note
@@ -189,7 +151,7 @@ export default function Worksheet({ members, currentMemberIndex, setCurrentMembe
 
       <div className={styles.board}>
         {SECTIONS.map((section) => {
-          const zoneNotes = notes.filter((note) => note.section === section.id);
+          const zoneNotes = notes.filter((n) => n.section === section.id);
           const Icon = section.icon;
           return (
             <div
@@ -211,41 +173,48 @@ export default function Worksheet({ members, currentMemberIndex, setCurrentMembe
                   zoneRefs.current[section.id] = el;
                 }}
               >
-                {zoneNotes.map((note) => (
-                  <div
-                    key={note.id}
-                    className={styles.note}
-                    style={{ left: note.x, top: note.y, width: NOTE_WIDTH }}
-                    onPointerDown={(e) => handleNotePointerDown(e, note)}
-                    onPointerMove={(e) => handleNotePointerMove(e, note)}
-                    onPointerUp={handleNotePointerUp}
-                    onPointerCancel={handleNotePointerUp}
-                  >
-                    <div className={styles.noteHeader}>
-                      <span className={styles.dot} style={{ background: note.color }} />
-                      <span className={styles.noteAuthor}>{note.author}</span>
-                      <button
-                        type="button"
-                        className={styles.delete}
-                        onPointerDown={(e) => e.stopPropagation()}
-                        onClick={() => removeNote(note.id)}
-                        aria-label={`Remove note by ${note.author}`}
-                      >
-                        <X size={12} />
-                      </button>
-                    </div>
+                {zoneNotes.map((note) => {
+                  const author = authorFor(note);
+                  const color = note.color || author?.color || "var(--text-dim)";
+                  return (
                     <div
-                      className={styles.text}
-                      style={{ color: note.color }}
-                      contentEditable
-                      suppressContentEditableWarning
-                      onPointerDown={(e) => e.stopPropagation()}
-                      onBlur={(e) => commitText(note.id, e.currentTarget.textContent)}
+                      key={note.id}
+                      className={styles.note}
+                      style={{ left: note.x, top: note.y, width: NOTE_WIDTH }}
+                      onPointerDown={handlePointerDown}
+                      onPointerMove={(e) => handlePointerMove(e, note)}
+                      onPointerUp={(e) => handlePointerUp(e, note)}
+                      onPointerCancel={(e) => handlePointerUp(e, note)}
                     >
-                      {note.text}
+                      <div className={styles.noteHeader}>
+                        <span className={styles.dot} style={{ background: color }} />
+                        <span className={styles.noteAuthor}>{author?.name || "—"}</span>
+                        <button
+                          type="button"
+                          className={styles.delete}
+                          onPointerDown={(e) => e.stopPropagation()}
+                          onClick={() => onRemoveNote(note.id)}
+                          aria-label={`Remove note by ${author?.name || "member"}`}
+                        >
+                          <X size={12} />
+                        </button>
+                      </div>
+                      <div
+                        className={styles.text}
+                        style={{ color }}
+                        contentEditable
+                        suppressContentEditableWarning
+                        onPointerDown={(e) => e.stopPropagation()}
+                        onBlur={(e) => {
+                          const next = e.currentTarget.textContent;
+                          if (next !== note.text) onUpdateNote(note.id, { text: next });
+                        }}
+                      >
+                        {note.text}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           );
