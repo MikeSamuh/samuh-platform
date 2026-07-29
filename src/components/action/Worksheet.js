@@ -65,7 +65,9 @@ export default function Worksheet({ team, currentMember, authors, custom }) {
   const [selected, setSelected] = useState(null);
   const practice = custom || selected || topVoted;
 
-  const [nameDraft, setNameDraft] = useState(custom || "");
+  // Custom canvases are named by their practice key; the default canvas can
+  // carry an optional display name on top of its selected practice.
+  const [nameDraft, setNameDraft] = useState(custom || team.defaultCanvasName || "");
 
   const me = currentMember ? authors.find((a) => a.id === currentMember.id) : null;
 
@@ -77,13 +79,16 @@ export default function Worksheet({ team, currentMember, authors, custom }) {
   });
 
   function commitRename() {
-    if (!custom) return;
     const trimmed = nameDraft.trim();
-    if (!trimmed || trimmed === custom) {
-      setNameDraft(custom);
+    if (custom) {
+      if (!trimmed || trimmed === custom) {
+        setNameDraft(custom);
+        return;
+      }
+      team.renameCanvasPractice(custom, trimmed);
       return;
     }
-    team.renameCanvasPractice(custom, trimmed);
+    team.setDefaultCanvasName(trimmed === practice ? "" : trimmed);
   }
 
   // Drag state lives outside React's tree manipulation: while dragging, the
@@ -293,26 +298,54 @@ export default function Worksheet({ team, currentMember, authors, custom }) {
             </div>
           </div>
         ) : (
-          <div className={styles.practicePicker}>
-            <label className={styles.practiceLabel} htmlFor="canvas-practice">
-              Practice
-            </label>
-            <div className={styles.selectWrap}>
-              <select
-                id="canvas-practice"
-                className={styles.practiceSelect}
-                value={practice}
-                onChange={(e) => setSelected(e.target.value)}
-              >
-                {teamPractices.map(({ label }) => (
-                  <option key={label} value={label}>
-                    {label === topVoted ? `${label} · most stars` : label}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown size={14} className={styles.selectChevron} />
+          <>
+            <div className={styles.practicePicker}>
+              <label className={styles.practiceLabel} htmlFor="canvas-practice">
+                Practice
+              </label>
+              <div className={styles.selectWrap}>
+                <select
+                  id="canvas-practice"
+                  className={styles.practiceSelect}
+                  value={practice}
+                  onChange={(e) => {
+                    setSelected(e.target.value);
+                    if (!team.defaultCanvasName) setNameDraft(e.target.value);
+                  }}
+                >
+                  {teamPractices.map(({ label }) => (
+                    <option key={label} value={label}>
+                      {label === topVoted ? `${label} · most stars` : label}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown size={14} className={styles.selectChevron} />
+              </div>
             </div>
-          </div>
+            <div className={styles.practicePicker}>
+              <label className={styles.practiceLabel} htmlFor="canvas-name-default">
+                Practice name
+              </label>
+              <div className={styles.newPracticeRow}>
+                <input
+                  id="canvas-name-default"
+                  className={styles.newPracticeInput}
+                  placeholder={practice}
+                  value={nameDraft}
+                  onChange={(e) => setNameDraft(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && commitRename()}
+                />
+                <button
+                  type="button"
+                  className={styles.newPracticeSave}
+                  onClick={commitRename}
+                  disabled={nameDraft.trim() === (team.defaultCanvasName || practice)}
+                >
+                  Save
+                </button>
+              </div>
+            </div>
+          </>
         )}
       </div>
 

@@ -3,16 +3,13 @@
 import { useState } from "react";
 import { Play, RotateCcw } from "lucide-react";
 import MediaAccordion from "@/components/MediaAccordion";
-import MetaphorCards from "@/components/launch/MetaphorCards";
 import CoachingCard from "@/components/CoachingCard";
 import { launchMedia } from "@/lib/mediaContent";
 import { bookingLinks } from "@/lib/bookingLinks";
-import { getAuthors } from "@/lib/authors";
 import panelStyles from "./Panel.module.css";
 import styles from "./LaunchPanel.module.css";
 
 export default function LaunchPanel({ team, currentMember, completeTask }) {
-  const authors = getAuthors(team.members);
   const [relaunched, setRelaunched] = useState(false);
 
   return (
@@ -67,16 +64,6 @@ export default function LaunchPanel({ team, currentMember, completeTask }) {
             Launch TeamQ+
           </button>
         )}
-      </div>
-
-      <div data-tour="metaphor">
-        <MetaphorCards
-          authors={authors}
-          currentMember={currentMember}
-          picks={team.cardPicks}
-          onPick={team.pickCard}
-          onDescribe={team.describeCard}
-        />
       </div>
 
       <CoachingCard

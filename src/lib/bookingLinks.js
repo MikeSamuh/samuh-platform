@@ -4,6 +4,10 @@
 const SAMUH_BOOKING_URL =
   "https://calendar.google.com/calendar/appointments/schedules/AcZssZ2GhcOiaIuGi6qcj2aNKFbU8Oz1r0cJbRLjbvxeSXsao29G7ijfgXcghESmXO0P6b0XNKjianB0";
 
+// The TeamQ+ survey members take on the Discover step (opens in a new window).
+// Paste the real survey URL here; null shows a "link coming soon" state.
+export const surveyLink = null;
+
 export const bookingLinks = {
   coachingCall: SAMUH_BOOKING_URL, // 30-min coaching call with Samuh
   teamGoogleCalendar: SAMUH_BOOKING_URL, // Samuh teams Google Calendar (Launch step)

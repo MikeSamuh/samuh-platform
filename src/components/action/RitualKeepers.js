@@ -91,7 +91,7 @@ export default function RitualKeepers({ members, keepers, onAdd, onRemove }) {
               setSelecting("");
             }}
           >
-            Add keeper
+            Add Ritual Keeper
           </button>
         </div>
       )}

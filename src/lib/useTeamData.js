@@ -189,6 +189,16 @@ export function useTeamData(teamId, userId) {
       await actions.completeTask("canvas-practices", trimmed);
     },
 
+    // Optional display name for the default canvas (single stored value).
+    async setDefaultCanvasName(name) {
+      const trimmed = name.trim();
+      const current = data.taskChecks["canvas-default-name"] || [];
+      for (const existing of current) {
+        await actions.uncompleteTask("canvas-default-name", existing);
+      }
+      if (trimmed) await actions.completeTask("canvas-default-name", trimmed);
+    },
+
     // Removing a canvas also removes its notes (namespaced by name).
     async removeCanvasPractice(name) {
       await actions.uncompleteTask("canvas-practices", name);
@@ -253,7 +263,7 @@ export function useTeamData(teamId, userId) {
         },
         { onConflict: "team_id,member_id" }
       );
-      await actions.completeTask("launch", "metaphor");
+      await actions.completeTask("discover", "metaphor");
     },
 
     async describeCard(memberId, description) {
@@ -406,6 +416,7 @@ export function useTeamData(teamId, userId) {
     isStepComplete,
     ritualKeepers,
     canvasPractices: data.taskChecks["canvas-practices"] || [],
+    defaultCanvasName: (data.taskChecks["canvas-default-name"] || [])[0] || null,
     feedbackCadence: (data.taskChecks["feedback-emails"] || [])[0] || "off",
     reload: load,
     ...actions,

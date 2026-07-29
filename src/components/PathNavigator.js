@@ -1,9 +1,14 @@
 "use client";
 
-import { steps } from "@/lib/steps";
+import { steps as allSteps } from "@/lib/steps";
 import styles from "./PathNavigator.module.css";
 
-export default function PathNavigator({ activeStepId, onSelect, unlockedIndex = steps.length - 1 }) {
+export default function PathNavigator({
+  steps = allSteps,
+  activeStepId,
+  onSelect,
+  unlockedIndex = allSteps.length - 1,
+}) {
   return (
     <nav className={styles.nav} aria-label="Team journey" data-tour="path">
       <div className={styles.line} />

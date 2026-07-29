@@ -19,7 +19,11 @@ export const stepTasks = {
     { id: "brief-team", label: "Watch how to brief your team" },
     { id: "launch-teamq", label: "Launch the TeamQ+ assessment" },
     { id: "follow-up", label: "Review follow-up best practices" },
+  ],
+  discover: [
+    { id: "tour", label: "Take the virtual walkthrough of this step" },
     { id: "metaphor", label: "Choose your metaphor card" },
+    { id: "survey", label: "Take the TeamQ+ survey" },
   ],
   awareness: [
     { id: "tour", label: "Take the virtual walkthrough of this step" },

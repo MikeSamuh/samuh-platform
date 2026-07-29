@@ -2,7 +2,15 @@
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 10px;
-  padding: 14px 16px;
+  padding: 16px 18px 14px;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 16px;
 }
 
 .title {
@@ -15,48 +23,128 @@
 .sub {
   font-size: 11px;
   color: var(--text-dim);
-  margin-bottom: 14px;
   line-height: 1.5;
+  max-width: 460px;
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 10px;
-}
-
-.entry {
-  background: var(--inset);
-  border-radius: 10px;
-  padding: 12px 14px;
-}
-
-.entryHead {
+.nav {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  flex: none;
+}
+
+.counter {
+  font-size: 12px;
+  color: var(--text-dim);
+  min-width: 40px;
+  text-align: right;
+}
+
+.arrow {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--chip);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.arrow:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.track {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 6px 4px 14px;
+  scrollbar-width: none;
+}
+
+.track::-webkit-scrollbar {
+  display: none;
+}
+
+.bigCard {
+  flex: none;
+  width: min(400px, 82%);
+  min-height: 320px;
+  scroll-snap-align: center;
+  background:
+    linear-gradient(165deg, var(--tint), transparent 62%),
+    var(--inset);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 34px 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: transform 0.25s ease, border-color 0.25s ease, opacity 0.25s ease;
+  transform: scale(0.94);
+  opacity: 0.65;
+}
+
+.bigCard[data-focused="true"] {
+  transform: scale(1);
+  opacity: 1;
+  border-color: var(--text-faint);
 }
 
 .emoji {
-  font-size: 26px;
+  font-size: 84px;
   line-height: 1;
 }
 
 .cardName {
-  font-size: 13px;
-  font-weight: 600;
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: 26px;
   color: var(--text);
 }
 
-.authorName {
+.blurb {
+  font-size: 13px;
+  color: var(--text-dim);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
   font-size: 11px;
-  font-weight: 600;
 }
 
 .quote {
-  margin-top: 8px;
-  font-size: 12px;
-  color: var(--text-dim);
+  margin-top: 6px;
+  font-size: 15px;
+  color: var(--text);
   font-style: italic;
-  line-height: 1.5;
+  line-height: 1.6;
+  max-width: 320px;
+}
+
+.dots {
+  display: flex;
+  justify-content: center;
+  gap: 7px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: none;
+  background: var(--chip);
+  cursor: pointer;
+  padding: 0;
+}
+
+.dot[data-active="true"] {
+  background: var(--accent);
 }

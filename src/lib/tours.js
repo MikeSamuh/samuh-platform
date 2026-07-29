@@ -43,7 +43,7 @@ export const tours = {
     {
       target: "checklist",
       title: "Launch tasks",
-      body: "Brief your team, launch the assessment, review follow-up practices, and pick your metaphor card.",
+      body: "Brief your team, launch the assessment, and review follow-up best practices.",
     },
     {
       target: "media",
@@ -55,10 +55,17 @@ export const tours = {
       title: "Launch TeamQ+",
       body: "One click invites every team member to take the assessment. Results feed the Awareness step.",
     },
+  ],
+  discover: [
     {
       target: "metaphor",
       title: "Metaphor cards",
-      body: "Pick the card that best describes your experience on this team, and say why. Everyone's picks show up below the deck.",
+      body: "Pick the card that best describes your experience on this team, and say why. Everyone's picks surface anonymously in Awareness.",
+    },
+    {
+      target: "survey",
+      title: "Take the survey",
+      body: "The TeamQ+ survey opens in a new window — your answers feed the team's results in Awareness.",
     },
   ],
   awareness: [

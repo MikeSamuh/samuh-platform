@@ -20,6 +20,7 @@ import TourCard from "@/components/TourCard";
 import RoleSwitcher from "@/components/RoleSwitcher";
 import PreparePanel from "@/components/panels/PreparePanel";
 import LaunchPanel from "@/components/panels/LaunchPanel";
+import DiscoverPanel from "@/components/panels/DiscoverPanel";
 import AwarenessPanel from "@/components/panels/AwarenessPanel";
 import BelongingPanel from "@/components/panels/BelongingPanel";
 import ActionPanel from "@/components/panels/ActionPanel";
@@ -28,21 +29,40 @@ import styles from "./AppShell.module.css";
 const panels = {
   prepare: PreparePanel,
   launch: LaunchPanel,
+  discover: DiscoverPanel,
   awareness: AwarenessPanel,
   belonging: BelongingPanel,
   action: ActionPanel,
 };
 
+// Prepare and Launch are the manager's setup work; team members join the
+// journey at Discover.
+const MEMBER_HIDDEN_STEPS = ["prepare", "launch"];
+
 export default function AppShell() {
   const { profile, isStaff, isManager } = useAuth();
   const team = useTeamData(profile?.team_id, profile?.id);
 
-  const [activeStepId, setActiveStepId] = useState(steps[0].id);
+  const visibleSteps =
+    isManager || isStaff
+      ? steps
+      : steps.filter((s) => !MEMBER_HIDDEN_STEPS.includes(s.id));
+
+  const [activeStepId, setActiveStepId] = useState(visibleSteps[0].id);
   const [view, setView] = useState("journey");
   const [tourActive, setTourActive] = useState(false);
 
   const ActivePanel = panels[activeStepId];
   const activeStep = steps.find((s) => s.id === activeStepId);
+
+  // Steps unlock in the order this role sees them.
+  let unlockedIndex = visibleSteps.length - 1;
+  for (let i = 0; i < visibleSteps.length; i++) {
+    if (!team.isStepComplete(visibleSteps[i].id)) {
+      unlockedIndex = i;
+      break;
+    }
+  }
 
   // Staff land on the dashboard; switching roles resets the view sensibly.
   useEffect(() => {
@@ -50,14 +70,24 @@ export default function AppShell() {
     setTourActive(false);
   }, [isStaff, profile?.id]);
 
+  // A role switch can leave the active step outside this role's list.
+  useEffect(() => {
+    if (!visibleSteps.some((s) => s.id === activeStepId)) {
+      setActiveStepId(visibleSteps[0].id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isManager, isStaff]);
+
   // Advance whenever the active step's checklist fills up, no matter which
   // path completed the last task (checkbox, media open, co-lead select,
   // team rename — several complete tasks inside the data layer).
   useEffect(() => {
     if (view !== "journey" || team.loading) return;
     if (!team.isStepComplete(activeStepId)) return;
-    const index = steps.findIndex((s) => s.id === activeStepId);
-    if (index < steps.length - 1) setActiveStepId(steps[index + 1].id);
+    const index = visibleSteps.findIndex((s) => s.id === activeStepId);
+    if (index !== -1 && index < visibleSteps.length - 1) {
+      setActiveStepId(visibleSteps[index + 1].id);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [team.taskChecks, team.loading, view]);
 
@@ -73,8 +103,8 @@ export default function AppShell() {
   }
 
   function selectStep(stepId) {
-    const index = steps.findIndex((s) => s.id === stepId);
-    if (index > team.unlockedIndex) return;
+    const index = visibleSteps.findIndex((s) => s.id === stepId);
+    if (index === -1 || index > unlockedIndex) return;
     setActiveStepId(stepId);
     setView("journey");
   }
@@ -149,9 +179,10 @@ export default function AppShell() {
         ) : (
           <>
             <PathNavigator
+              steps={visibleSteps}
               activeStepId={activeStepId}
               onSelect={selectStep}
-              unlockedIndex={team.unlockedIndex}
+              unlockedIndex={unlockedIndex}
             />
             <div className={styles.stepBody}>
               <div className={styles.stepMain}>

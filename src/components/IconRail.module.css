@@ -7,8 +7,10 @@
   z-index: 60;
 }
 
+/* Fixed to the viewport so the menu stays visible wherever the page is
+   scrolled; the holder reserves its 56px column in the layout. */
 .rail {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   bottom: 0;
