@@ -68,3 +68,9 @@
 .relaunchButton:hover {
   border-color: var(--text-faint);
 }
+
+.launchedAt {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-top: 4px;
+}

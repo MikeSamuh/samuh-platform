@@ -11,6 +11,7 @@ const EMPTY = {
   coLead: null,
   ritualKeeper: null,
   launched: false,
+  launchedAt: null,
   cardPicks: {},
   votes: { environment: {}, practices: {} },
   reflections: [],
@@ -79,6 +80,7 @@ export function useTeamData(teamId, userId) {
       coLead: teamState.data?.co_lead_member_id || null,
       ritualKeeper: teamState.data?.ritual_keeper_member_id || null,
       launched: teamState.data?.launched || false,
+      launchedAt: teamState.data?.launched_at || null,
       cardPicks: groupPicks(picks.data || []),
       votes: groupVotes(votes.data || []),
       reflections: reflections.data || [],
@@ -180,18 +182,41 @@ export function useTeamData(teamId, userId) {
       await ensureTeamState({ ritual_keeper_member_id: mirror });
     },
 
-    // Custom practices added to the canvas, same storage trick.
+    // Custom practice canvases, same storage trick.
     async addCanvasPractice(name) {
       const trimmed = name.trim();
       if (!trimmed) return;
       await actions.completeTask("canvas-practices", trimmed);
     },
 
+    // Removing a canvas also removes its notes (namespaced by name).
+    async removeCanvasPractice(name) {
+      await actions.uncompleteTask("canvas-practices", name);
+      const prefix = `${name}::`;
+      for (const note of data.notes.filter((n) => n.section.startsWith(prefix))) {
+        await actions.removeNote(note.id);
+      }
+    },
+
+    // Renaming a canvas re-keys its notes, which are namespaced by name.
+    async renameCanvasPractice(oldName, newName) {
+      const trimmed = newName.trim();
+      const existing = data.taskChecks["canvas-practices"] || [];
+      if (!trimmed || trimmed === oldName || existing.includes(trimmed)) return;
+      await actions.completeTask("canvas-practices", trimmed);
+      await actions.uncompleteTask("canvas-practices", oldName);
+      const prefix = `${oldName}::`;
+      for (const note of data.notes.filter((n) => n.section.startsWith(prefix))) {
+        await actions.updateNote(note.id, {
+          section: `${trimmed}::${note.section.slice(prefix.length)}`,
+        });
+      }
+    },
+
     async relaunchSurvey() {
-      await ensureTeamState({
-        launched: true,
-        launched_at: new Date().toISOString(),
-      });
+      const now = new Date().toISOString();
+      setData((d) => ({ ...d, launchedAt: now }));
+      await ensureTeamState({ launched: true, launched_at: now });
     },
 
     async setFeedbackCadence(cadence) {
@@ -205,11 +230,9 @@ export function useTeamData(teamId, userId) {
     },
 
     async setLaunched(value) {
-      setData((d) => ({ ...d, launched: value }));
-      await ensureTeamState({
-        launched: value,
-        launched_at: value ? new Date().toISOString() : null,
-      });
+      const now = value ? new Date().toISOString() : null;
+      setData((d) => ({ ...d, launched: value, launchedAt: now }));
+      await ensureTeamState({ launched: value, launched_at: now });
       if (value) await actions.completeTask("launch", "launch-teamq");
     },
 

@@ -41,8 +41,11 @@ function parseSection(section) {
   return { practice: section.slice(0, i), zone: section.slice(i + 2) };
 }
 
-export default function Worksheet({ team, currentMember, authors }) {
-  const { notes, votes, canvasPractices } = team;
+// One full canvas per practice. The default canvas opens on the most-starred
+// team practice (switchable via dropdown); each custom canvas (prop `custom`)
+// is its own board with an editable name section.
+export default function Worksheet({ team, currentMember, authors, custom }) {
+  const { notes, votes } = team;
 
   // Most-starred team practice seeds the default canvas.
   const topVoted = useMemo(() => {
@@ -59,23 +62,29 @@ export default function Worksheet({ team, currentMember, authors }) {
     return best || teamPractices[0].label;
   }, [votes.practices]);
 
-  const allPractices = useMemo(() => {
-    const base = teamPractices.map((p) => p.label);
-    return [...base, ...canvasPractices.filter((p) => !base.includes(p))];
-  }, [canvasPractices]);
-
   const [selected, setSelected] = useState(null);
-  const practice = selected || topVoted;
+  const practice = custom || selected || topVoted;
 
-  const [addingPractice, setAddingPractice] = useState(false);
-  const [newPractice, setNewPractice] = useState("");
+  const [nameDraft, setNameDraft] = useState(custom || "");
 
   const me = currentMember ? authors.find((a) => a.id === currentMember.id) : null;
 
   const canvasNotes = notes.filter((n) => {
     const parsed = parseSection(n.section);
+    // Bare-zone notes predate per-practice canvases; they live on the default
+    // canvas's top-voted practice.
     return (parsed.practice || topVoted) === practice;
   });
+
+  function commitRename() {
+    if (!custom) return;
+    const trimmed = nameDraft.trim();
+    if (!trimmed || trimmed === custom) {
+      setNameDraft(custom);
+      return;
+    }
+    team.renameCanvasPractice(custom, trimmed);
+  }
 
   // Drag state lives outside React's tree manipulation: while dragging, the
   // note renders in a board-level overlay (so it can cross zones freely) and
@@ -169,15 +178,6 @@ export default function Worksheet({ team, currentMember, authors }) {
     });
   }
 
-  async function handleAddPractice() {
-    const name = newPractice.trim();
-    if (!name) return;
-    await team.addCanvasPractice(name);
-    setSelected(name);
-    setNewPractice("");
-    setAddingPractice(false);
-  }
-
   const boardRect = boardRef.current?.getBoundingClientRect();
 
   function renderNote(note, dragging) {
@@ -257,52 +257,62 @@ export default function Worksheet({ team, currentMember, authors }) {
       </div>
 
       <div className={styles.practiceBar}>
-        <div className={styles.practicePicker}>
-          <label className={styles.practiceLabel} htmlFor="canvas-practice">
-            Practice
-          </label>
-          <div className={styles.selectWrap}>
-            <select
-              id="canvas-practice"
-              className={styles.practiceSelect}
-              value={practice}
-              onChange={(e) => setSelected(e.target.value)}
-            >
-              {allPractices.map((p) => (
-                <option key={p} value={p}>
-                  {p === topVoted ? `${p} · most stars` : p}
-                </option>
-              ))}
-            </select>
-            <ChevronDown size={14} className={styles.selectChevron} />
-          </div>
-        </div>
-        {addingPractice ? (
-          <div className={styles.newPracticeRow}>
-            <input
-              autoFocus
-              className={styles.newPracticeInput}
-              placeholder="Name the new practice"
-              value={newPractice}
-              onChange={(e) => setNewPractice(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleAddPractice();
-                if (e.key === "Escape") setAddingPractice(false);
-              }}
-            />
-            <button type="button" className={styles.newPracticeSave} onClick={handleAddPractice}>
-              Add
-            </button>
+        {custom ? (
+          <div className={styles.practicePicker}>
+            <label className={styles.practiceLabel} htmlFor={`canvas-name-${custom}`}>
+              Practice name
+            </label>
+            <div className={styles.newPracticeRow}>
+              <input
+                id={`canvas-name-${custom}`}
+                className={styles.newPracticeInput}
+                placeholder="Name this practice"
+                value={nameDraft}
+                onChange={(e) => setNameDraft(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && commitRename()}
+              />
+              <button
+                type="button"
+                className={styles.newPracticeSave}
+                onClick={commitRename}
+                disabled={!nameDraft.trim() || nameDraft.trim() === custom}
+              >
+                Save
+              </button>
+              <button
+                type="button"
+                className={styles.removeCanvas}
+                onClick={() => {
+                  if (window.confirm(`Remove the "${custom}" canvas and its notes?`)) {
+                    team.removeCanvasPractice(custom);
+                  }
+                }}
+              >
+                Remove canvas
+              </button>
+            </div>
           </div>
         ) : (
-          <button
-            type="button"
-            className={styles.newPracticeButton}
-            onClick={() => setAddingPractice(true)}
-          >
-            <Plus size={13} />
-            New practice
-          </button>
+          <div className={styles.practicePicker}>
+            <label className={styles.practiceLabel} htmlFor="canvas-practice">
+              Practice
+            </label>
+            <div className={styles.selectWrap}>
+              <select
+                id="canvas-practice"
+                className={styles.practiceSelect}
+                value={practice}
+                onChange={(e) => setSelected(e.target.value)}
+              >
+                {teamPractices.map(({ label }) => (
+                  <option key={label} value={label}>
+                    {label === topVoted ? `${label} · most stars` : label}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown size={14} className={styles.selectChevron} />
+            </div>
+          </div>
         )}
       </div>
 

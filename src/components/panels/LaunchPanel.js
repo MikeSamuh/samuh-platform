@@ -30,6 +30,18 @@ export default function LaunchPanel({ team, currentMember, completeTask }) {
             <div className={styles.status}>
               TeamQ+ launched &middot; {team.members.length} of {team.members.length} invited, 0
               responded
+              {team.launchedAt && (
+                <div className={styles.launchedAt}>
+                  Last launched{" "}
+                  {new Date(team.launchedAt).toLocaleString(undefined, {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                    hour: "numeric",
+                    minute: "2-digit",
+                  })}
+                </div>
+              )}
             </div>
             <button
               type="button"
