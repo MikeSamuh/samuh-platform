@@ -5,6 +5,7 @@
 // allowed. Scheduling with Samuh is offered on every step but never required.
 export const stepTasks = {
   prepare: [
+    { id: "team-name", label: "Name your team" },
     { id: "methodology", label: "Watch the Samuh methodology & awareness walkthrough" },
     { id: "colead-why", label: "Watch why a co-lead matters" },
     { id: "tour", label: "Take the virtual tour of the platform" },

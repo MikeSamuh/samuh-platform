@@ -111,6 +111,7 @@ export function useTeamData(teamId, userId) {
       if (!trimmed) return;
       setData((d) => ({ ...d, team: { ...d.team, name: trimmed } }));
       await supabase.from("teams").update({ name: trimmed }).eq("id", teamId);
+      await actions.completeTask("prepare", "team-name");
     },
 
     async addMember({ name, email = "", tenure = "" }) {
