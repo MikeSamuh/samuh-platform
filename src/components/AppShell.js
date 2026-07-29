@@ -97,8 +97,35 @@ export default function AppShell() {
           </div>
         </div>
 
+        {team.error && (
+          <div className={styles.errorBar} role="alert">
+            <span>{team.error}</span>
+            <button type="button" className={styles.errorDismiss} onClick={team.dismissError}>
+              Dismiss
+            </button>
+          </div>
+        )}
+
         {view === "admin" && isStaff ? (
           <AdminDashboard />
+        ) : isStaff ? (
+          // Samuh staff belong to no team, so the journey has nothing to read
+          // or write. Say so instead of showing an empty, silently-failing form.
+          <div className={styles.staffNotice}>
+            <div className={styles.staffNoticeTitle}>You&apos;re signed in as Samuh staff</div>
+            <p className={styles.staffNoticeBody}>
+              Staff accounts aren&apos;t part of any client team, so there&apos;s no journey to
+              fill in here. Use the team progress dashboard to see how every client team is
+              doing. To walk the journey yourself, sign in with a manager or member account.
+            </p>
+            <button
+              type="button"
+              className={styles.staffNoticeButton}
+              onClick={() => setView("admin")}
+            >
+              Go to team progress
+            </button>
+          </div>
         ) : (
           <>
             <PathNavigator
@@ -113,6 +140,7 @@ export default function AppShell() {
                   currentMember={team.currentMember}
                   completeTask={completeTask}
                   startTour={() => setTourActive(true)}
+                  canManage={isManager}
                 />
               </div>
               <div className={styles.checklistWrap}>

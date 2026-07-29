@@ -4,15 +4,17 @@ import { UserCheck } from "lucide-react";
 import MediaAccordion from "@/components/MediaAccordion";
 import MemberSelectCard from "@/components/MemberSelectCard";
 import TeamMembers from "@/components/prepare/TeamMembers";
+import TeamNameCard from "@/components/prepare/TeamNameCard";
 import TourCard from "@/components/prepare/TourCard";
 import CoachingCard from "@/components/CoachingCard";
 import { prepareMedia } from "@/lib/mediaContent";
 import { bookingLinks } from "@/lib/bookingLinks";
 import styles from "./Panel.module.css";
 
-export default function PreparePanel({ team, completeTask, startTour }) {
+export default function PreparePanel({ team, completeTask, startTour, canManage }) {
   return (
     <div className={styles.panel}>
+      {canManage && <TeamNameCard team={team.team} onRename={team.renameTeam} />}
       <div data-tour="media">
         <MediaAccordion
           items={prepareMedia}

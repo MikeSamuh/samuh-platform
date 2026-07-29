@@ -45,6 +45,15 @@ function groupPicks(rows) {
 export function useTeamData(teamId, userId) {
   const [data, setData] = useState(EMPTY);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Writes used to fail silently, which made a missing team look like a
+  // broken button. Surface anything the database rejects.
+  function check({ error: err }, action) {
+    if (err) setError(`Couldn't ${action}: ${err.message}`);
+    else setError(null);
+    return !err;
+  }
 
   const load = useCallback(async () => {
     if (!teamId) {
@@ -106,12 +115,13 @@ export function useTeamData(teamId, userId) {
 
     async addMember({ name, email = "", tenure = "" }) {
       if (!name?.trim()) return;
-      const { data: row } = await supabase
+      const res = await supabase
         .from("members")
         .insert({ team_id: teamId, name: name.trim(), email: email.trim(), tenure: tenure.trim() })
         .select()
         .single();
-      if (row) setData((d) => ({ ...d, members: [...d.members, row] }));
+      if (!check(res, "add that member")) return;
+      setData((d) => ({ ...d, members: [...d.members, res.data] }));
       await actions.completeTask("prepare", "members");
     },
 
@@ -310,5 +320,15 @@ export function useTeamData(teamId, userId) {
     }
   }
 
-  return { ...data, loading, currentMember, unlockedIndex, isStepComplete, reload: load, ...actions };
+  return {
+    ...data,
+    loading,
+    error,
+    dismissError: () => setError(null),
+    currentMember,
+    unlockedIndex,
+    isStepComplete,
+    reload: load,
+    ...actions,
+  };
 }
