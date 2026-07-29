@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { steps } from "@/lib/steps";
 import { stepTasks } from "@/lib/stepTasks";
@@ -37,27 +37,25 @@ export default function AppShell() {
 
   const ActivePanel = panels[activeStepId];
 
-  function advanceIfComplete(stepId) {
-    if (stepId !== activeStepId) return;
-    const index = steps.findIndex((s) => s.id === stepId);
+  // Advance whenever the active step's checklist fills up, no matter which
+  // path completed the last task (checkbox, media open, co-lead select,
+  // team rename — the last three complete tasks inside the data layer).
+  useEffect(() => {
+    if (view !== "journey" || team.loading) return;
+    if (!team.isStepComplete(activeStepId)) return;
+    const index = steps.findIndex((s) => s.id === activeStepId);
     if (index < steps.length - 1) setActiveStepId(steps[index + 1].id);
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [team.taskChecks, team.loading, view]);
 
-  async function completeTask(stepId, taskId) {
-    await team.completeTask(stepId, taskId);
-    const checks = {
-      ...team.taskChecks,
-      [stepId]: [...(team.taskChecks[stepId] || []), taskId],
-    };
-    if (team.isStepComplete(stepId, checks)) advanceIfComplete(stepId);
-  }
+  const completeTask = team.completeTask;
 
   async function toggleTask(stepId, taskId) {
     const checked = (team.taskChecks[stepId] || []).includes(taskId);
     if (checked) {
       await team.uncompleteTask(stepId, taskId);
     } else {
-      await completeTask(stepId, taskId);
+      await team.completeTask(stepId, taskId);
     }
   }
 
