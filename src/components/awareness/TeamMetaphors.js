@@ -5,16 +5,10 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { metaphorCards, parsePickDescription } from "@/lib/metaphorCards";
 import styles from "./TeamMetaphors.module.css";
 
-// The cards chosen on Launch, shown anonymously as a large card deck the team
-// scrolls through together — one card per member.
-const TINTS = [
-  "rgba(74, 158, 255, 0.14)",
-  "rgba(214, 64, 154, 0.13)",
-  "rgba(95, 180, 122, 0.13)",
-  "rgba(232, 138, 42, 0.12)",
-  "rgba(127, 119, 221, 0.14)",
-  "rgba(58, 149, 172, 0.14)",
-];
+// The cards chosen on Discover, shown anonymously as a card deck the team
+// scrolls through together — one card per member. Each card takes one accent
+// color, echoing the single-accent hand-drawn card art.
+const ACCENTS = ["#7fb0d4", "#d4699c", "#d9a441", "#7fb383", "#8b83d9", "#5d9fb5"];
 
 export default function TeamMetaphors({ authors, picks }) {
   const trackRef = useRef(null);
@@ -103,7 +97,7 @@ export default function TeamMetaphors({ authors, picks }) {
             key={key}
             className={styles.bigCard}
             data-focused={i === index}
-            style={{ "--tint": TINTS[i % TINTS.length] }}
+            style={{ "--card-accent": ACCENTS[i % ACCENTS.length] }}
             onClick={() => scrollToCard(i)}
           >
             <span className={styles.emoji}>{card.emoji}</span>

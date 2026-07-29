@@ -10,7 +10,10 @@ export default function DiscoverPanel({ team, currentMember, completeTask }) {
   return (
     <div className={styles.panel}>
       <div data-tour="metaphor">
+        {/* Keyed by member: the name/why draft state must never survive a
+            profile switch and leak into another person's form. */}
         <MetaphorCards
+          key={currentMember?.id || "no-member"}
           currentMember={currentMember}
           picks={team.cardPicks}
           onSave={team.saveCardPick}

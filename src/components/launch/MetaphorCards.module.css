@@ -40,26 +40,28 @@
   margin-bottom: 16px;
 }
 
+/* White hand-drawn illustration cards, per the Samuh card art style. */
 .cardButton {
   aspect-ratio: 3 / 4;
-  background: var(--inset);
-  border: 1px solid var(--border);
-  border-radius: 14px;
+  background: #fbfaf7;
+  border: 1px solid #e7e3d9;
+  border-radius: 12px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
   transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .cardButton:hover {
-  border-color: var(--text-faint);
   transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
 }
 
 .cardButton[data-selected="true"] {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.2);
+  box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.35), 0 6px 18px rgba(0, 0, 0, 0.35);
   transform: translateY(-3px);
 }
 
@@ -79,9 +81,14 @@
 }
 
 .chosenEmoji {
-  font-size: 72px;
+  font-size: 64px;
   line-height: 1;
   flex: none;
+  background: #fbfaf7;
+  border: 1px solid #e7e3d9;
+  border-radius: 12px;
+  padding: 26px 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
 }
 
 .saveFields {
