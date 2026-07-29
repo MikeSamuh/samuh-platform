@@ -8,11 +8,8 @@ export default function StepChecklist({ stepId, tasks, checked, onToggle }) {
   const allDone = doneCount === tasks.length;
 
   return (
-    <aside className={styles.checklist} aria-label="Step tasks" data-tour="checklist">
-      <div className={styles.title}>Step tasks</div>
-      <div className={styles.progress}>
-        {doneCount} of {tasks.length} complete &middot; auto-checks as you go, or tick them yourself
-      </div>
+    <aside className={styles.checklist} aria-label="Tasks" data-tour="checklist">
+      <div className={styles.title}>Tasks</div>
       <ul className={styles.items}>
         {tasks.map((task) => {
           const done = checked.includes(task.id);
