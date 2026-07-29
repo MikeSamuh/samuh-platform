@@ -6,9 +6,7 @@ import { metaphorCards, parsePickDescription } from "@/lib/metaphorCards";
 import styles from "./TeamMetaphors.module.css";
 
 // The cards chosen on Discover, shown anonymously as a card deck the team
-// scrolls through together — one card per member. Each card takes one accent
-// color, echoing the single-accent hand-drawn card art.
-const ACCENTS = ["#7fb0d4", "#d4699c", "#d9a441", "#7fb383", "#8b83d9", "#5d9fb5"];
+// scrolls through together — one card per member.
 
 export default function TeamMetaphors({ authors, picks }) {
   const trackRef = useRef(null);
@@ -97,10 +95,16 @@ export default function TeamMetaphors({ authors, picks }) {
             key={key}
             className={styles.bigCard}
             data-focused={i === index}
-            style={{ "--card-accent": ACCENTS[i % ACCENTS.length] }}
+            style={{ "--card-accent": card.accent }}
             onClick={() => scrollToCard(i)}
           >
-            <span className={styles.emoji}>{card.emoji}</span>
+            <span className={styles.art}>
+              {card.src ? (
+                <img className={styles.artImage} src={card.src} alt="" draggable={false} />
+              ) : (
+                <span className={styles.artFallback}>{card.name}</span>
+              )}
+            </span>
             {name && <div className={styles.cardName}>{name}</div>}
             {why && <div className={styles.quote}>“{why}”</div>}
           </div>

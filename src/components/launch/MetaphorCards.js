@@ -5,6 +5,19 @@ import { Check } from "lucide-react";
 import { metaphorCards, parsePickDescription } from "@/lib/metaphorCards";
 import styles from "./MetaphorCards.module.css";
 
+// Cards still awaiting illustration show their name hand-lettered on the same
+// black card, so the deck is fully usable before the art lands.
+function CardArt({ card }) {
+  if (card.src) {
+    return <img className={styles.art} src={card.src} alt="" draggable={false} />;
+  }
+  return (
+    <span className={styles.artFallback} style={{ "--accent": card.accent }}>
+      {card.name}
+    </span>
+  );
+}
+
 // Image-only deck: pick the image that fits, give it your own name, say why,
 // and save. Picks surface anonymously in Awareness — no team list here.
 export default function MetaphorCards({ currentMember, picks, onSave }) {
@@ -19,7 +32,9 @@ export default function MetaphorCards({ currentMember, picks, onSave }) {
   const selectedCard = metaphorCards.find((c) => c.id === cardId);
   const dirty =
     cardId &&
-    (cardId !== saved?.cardId || name !== (savedParsed?.name || "") || why !== (savedParsed?.why || ""));
+    (cardId !== saved?.cardId ||
+      name !== (savedParsed?.name || "") ||
+      why !== (savedParsed?.why || ""));
 
   async function handleSave() {
     if (!currentMember || !cardId) return;
@@ -55,14 +70,16 @@ export default function MetaphorCards({ currentMember, picks, onSave }) {
             aria-label={card.name}
             title={card.name}
           >
-            <span className={styles.emoji}>{card.emoji}</span>
+            <CardArt card={card} />
           </button>
         ))}
       </div>
 
       {selectedCard && (
         <div className={styles.saveArea}>
-          <span className={styles.chosenEmoji}>{selectedCard.emoji}</span>
+          <span className={styles.chosenCard}>
+            <CardArt card={selectedCard} />
+          </span>
           <div className={styles.saveFields}>
             <div className={styles.field}>
               <label className={styles.fieldLabel} htmlFor="card-name">

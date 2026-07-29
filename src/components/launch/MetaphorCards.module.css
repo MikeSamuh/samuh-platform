@@ -35,39 +35,57 @@
 
 .deck {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
   gap: 12px;
   margin-bottom: 16px;
+  max-height: 620px;
+  overflow-y: auto;
+  padding-right: 4px;
 }
 
-/* White hand-drawn illustration cards, per the Samuh card art style. */
+/* Black cards with white line art, per the Samuh illustration style. */
 .cardButton {
   aspect-ratio: 3 / 4;
-  background: #fbfaf7;
-  border: 1px solid #e7e3d9;
+  background: #000;
+  border: 1px solid #2e2f31;
   border-radius: 12px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  padding: 10px;
   transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .cardButton:hover {
   transform: translateY(-3px);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  border-color: var(--text-faint);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
 }
 
 .cardButton[data-selected="true"] {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.35), 0 6px 18px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.35), 0 6px 18px rgba(0, 0, 0, 0.5);
   transform: translateY(-3px);
 }
 
-.emoji {
-  font-size: 64px;
-  line-height: 1;
+.art {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  user-select: none;
+}
+
+/* Cards awaiting illustration: hand-lettered name, accent underline. */
+.artFallback {
+  font-family: var(--font-hand), cursive;
+  font-size: 23px;
+  line-height: 1.15;
+  color: #fff;
+  text-align: center;
+  padding: 6px 4px 10px;
+  border-bottom: 3px solid var(--accent);
 }
 
 .saveArea {
@@ -80,15 +98,18 @@
   flex-wrap: wrap;
 }
 
-.chosenEmoji {
-  font-size: 64px;
-  line-height: 1;
+.chosenCard {
   flex: none;
-  background: #fbfaf7;
-  border: 1px solid #e7e3d9;
+  width: 150px;
+  aspect-ratio: 3 / 4;
+  background: #000;
+  border: 1px solid #2e2f31;
   border-radius: 12px;
-  padding: 26px 20px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 }
 
 .saveFields {
