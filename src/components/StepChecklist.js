@@ -23,8 +23,9 @@ export default function StepChecklist({ stepId, tasks, checked, onToggle }) {
                 checked={done}
                 onChange={() => onToggle?.(stepId, task.id)}
               />
-              <label htmlFor={inputId} className={styles.label}>
-                {task.label}
+              <label htmlFor={inputId} className={styles.labelBlock}>
+                <span className={styles.label}>{task.label}</span>
+                {task.sub && <span className={styles.sub}>{task.sub}</span>}
               </label>
             </li>
           );
@@ -32,7 +33,7 @@ export default function StepChecklist({ stepId, tasks, checked, onToggle }) {
       </ul>
       {allDone && (
         <div className={styles.done}>
-          <CheckCircle2 size={14} />
+          <CheckCircle2 size={16} />
           Step complete
         </div>
       )}

@@ -14,12 +14,12 @@
 
 .wordmark {
   font-family: var(--font-serif), Georgia, serif;
-  font-size: 22px;
+  font-size: 27px;
   color: var(--text);
 }
 
 .score {
-  font-size: 38px;
+  font-size: 44px;
   font-weight: 500;
   color: var(--text);
   margin-top: 8px;
@@ -27,12 +27,12 @@
 }
 
 .scoreUnit {
-  font-size: 12px;
+  font-size: 20px;
   color: var(--text-dim);
 }
 
 .label {
-  font-size: 12px;
+  font-size: var(--fs-eyebrow);
   color: #cfd0d2;
   margin-bottom: 10px;
 }
@@ -45,7 +45,7 @@
 }
 
 .pointer {
-  font-size: 22px;
+  font-size: 27px;
   font-weight: 500;
   color: var(--text);
 }
@@ -68,14 +68,14 @@
 }
 
 .tierLabel {
-  font-size: 11px;
+  font-size: 20px;
   color: #cfd0d2;
   margin-left: 8px;
   white-space: nowrap;
 }
 
 .loss {
-  font-size: 34px;
+  font-size: 40px;
   font-weight: 500;
   color: var(--text);
   margin-top: 8px;
@@ -83,6 +83,6 @@
 }
 
 .lossSub {
-  font-size: 12px;
+  font-size: 20px;
   color: var(--text-dim);
 }

@@ -3,11 +3,11 @@
   flex-direction: column;
   gap: 20px;
   padding: 8px 48px 48px;
-  max-width: 960px;
+  max-width: 1180px;
 }
 
 .eyebrow {
-  font-size: 11px;
+  font-size: var(--fs-eyebrow);
   color: var(--text-faint);
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -21,7 +21,7 @@
 }
 
 .cardTitle {
-  font-size: 13px;
+  font-size: var(--fs-title);
   color: var(--text);
   font-weight: 500;
   margin-bottom: 12px;
@@ -35,9 +35,9 @@
 }
 
 .stepLabel {
-  width: 110px;
+  width: 160px;
   flex: none;
-  font-size: 12px;
+  font-size: 20px;
   color: var(--text);
 }
 
@@ -62,7 +62,7 @@
 
 .stepCount {
   flex: none;
-  font-size: 11px;
+  font-size: var(--fs-eyebrow);
   color: var(--text-dim);
   width: 64px;
   text-align: right;
@@ -81,7 +81,7 @@
   background: var(--inset);
   border-radius: 8px;
   padding: 10px 12px;
-  font-size: 12px;
+  font-size: 20px;
   color: var(--text-dim);
 }
 
@@ -101,12 +101,12 @@
 .table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 12px;
+  font-size: 20px;
 }
 
 .table th {
   text-align: left;
-  font-size: 10px;
+  font-size: 20px;
   color: var(--text-faint);
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -133,7 +133,7 @@
 
 .badge {
   display: inline-block;
-  font-size: 9px;
+  font-size: 20px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   border-radius: 8px;
@@ -152,13 +152,13 @@
 }
 
 .empty {
-  font-size: 12px;
+  font-size: 20px;
   color: var(--text-faint);
   padding: 6px 0;
 }
 
 .teamMeta {
-  font-size: 11px;
+  font-size: 20px;
   font-weight: 400;
   color: var(--text-faint);
   margin-left: 9px;

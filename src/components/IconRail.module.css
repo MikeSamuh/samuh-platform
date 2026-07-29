@@ -75,7 +75,7 @@
 }
 
 .itemLabel {
-  font-size: 13px;
+  font-size: 20px;
   opacity: 0;
   transition: opacity 0.15s ease 0.05s;
 }

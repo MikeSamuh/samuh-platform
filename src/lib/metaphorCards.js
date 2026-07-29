@@ -1,14 +1,13 @@
 // Metaphor card deck for the Discover step. Each member picks the image that
 // best describes their experience on the team, names it themselves, and says
-// why.
+// why. Cards carry no words — the image is the whole prompt.
 //
-// `src` points at the illustration in /public/cards (white line art on black,
-// one accent colour, in the Samuh hand-drawn style). Cards still awaiting
-// illustration have `src: null` and fall back to a hand-lettered name on the
-// same black card, so the deck is usable now; `brief` is the illustrator's
-// note for what the drawing should show. `name` is never shown on the deck —
-// it is the accessibility label, and the fallback if a member doesn't rename
-// the card themselves.
+// `src` is the card art in /public/cards: white line art on black with one
+// accent colour. Five are the Samuh hand-drawn illustrations; the rest are
+// simple SVG line drawings standing in until those are illustrated, so
+// swapping one in is a one-line change. `brief` is the illustrator's note.
+// `name` is never shown on the card — it is the accessibility label and the
+// fallback if a member doesn't rename their pick.
 
 export const metaphorCards = [
   // ——— Direction and alignment ———
@@ -22,21 +21,21 @@ export const metaphorCards = [
   {
     id: "two-maps",
     name: "Two Maps, One Journey",
-    src: null,
+    src: "/cards/two-maps.svg",
     accent: "#7fb0d4",
     brief: "Two people back to back, each holding a different map, walking apart.",
   },
   {
     id: "tug-of-war",
     name: "Tug of War",
-    src: null,
+    src: "/cards/tug-of-war.svg",
     accent: "#d4699c",
     brief: "Rope pulled hard from both ends, no one moving, knot in the middle.",
   },
   {
     id: "north-stars",
     name: "Everyone's Own North Star",
-    src: null,
+    src: "/cards/north-stars.svg",
     accent: "#d9a441",
     brief: "Figures looking up at different stars, each pointing somewhere else.",
   },
@@ -59,28 +58,28 @@ export const metaphorCards = [
   {
     id: "spinning-plates",
     name: "Spinning Plates",
-    src: null,
+    src: "/cards/spinning-plates.svg",
     accent: "#d9a441",
     brief: "One figure spinning many plates on poles, one already wobbling.",
   },
   {
     id: "rush-hour",
     name: "Rush Hour, Every Hour",
-    src: null,
+    src: "/cards/rush-hour.svg",
     accent: "#d4699c",
     brief: "Dense traffic of tiny figures, all crossing, no one stopping.",
   },
   {
     id: "juggling-glass",
     name: "Juggling Glass and Rubber",
-    src: null,
+    src: "/cards/juggling-glass.svg",
     accent: "#d4699c",
     brief: "A juggler mid-throw; some balls drawn as glass, some as rubber.",
   },
   {
     id: "piano",
     name: "Carrying the Piano Together",
-    src: null,
+    src: "/cards/piano.svg",
     accent: "#7fb383",
     brief: "Several figures carrying one heavy piano up stairs, straining but together.",
   },
@@ -96,21 +95,21 @@ export const metaphorCards = [
   {
     id: "upstream",
     name: "Rowing Upstream",
-    src: null,
+    src: "/cards/upstream.svg",
     accent: "#7fb0d4",
     brief: "Boat pointed against a strong current, oars deep, making slow ground.",
   },
   {
     id: "last-mile",
     name: "The Last Mile",
-    src: null,
+    src: "/cards/last-mile.svg",
     accent: "#d9a441",
     brief: "Runners near a finish line, tired but leaning forward.",
   },
   {
     id: "bridge-crossing",
     name: "Building the Bridge While Crossing It",
-    src: null,
+    src: "/cards/bridge-crossing.svg",
     accent: "#d9a441",
     brief: "Figures laying planks just ahead of their own feet over a gap.",
   },
@@ -126,28 +125,28 @@ export const metaphorCards = [
   {
     id: "islands",
     name: "Islands in the Same Sea",
-    src: null,
+    src: "/cards/islands.svg",
     accent: "#7fb0d4",
     brief: "Separate small islands, one figure each, no bridges between them.",
   },
   {
     id: "extra-chairs",
     name: "The Table With Extra Chairs",
-    src: null,
+    src: "/cards/extra-chairs.svg",
     accent: "#7fb383",
     brief: "A full table with space deliberately left, chairs pulled out invitingly.",
   },
   {
     id: "campfire",
     name: "The Campfire",
-    src: null,
+    src: "/cards/campfire.svg",
     accent: "#d9a441",
     brief: "Figures in a ring around a fire, faces lit, leaning in.",
   },
   {
     id: "potluck",
     name: "Potluck",
-    src: null,
+    src: "/cards/potluck.svg",
     accent: "#7fb383",
     brief: "Everyone arriving with a different dish, table filling up.",
   },
@@ -156,35 +155,35 @@ export const metaphorCards = [
   {
     id: "orchestra",
     name: "The Orchestra Finding Its Key",
-    src: null,
+    src: "/cards/orchestra.svg",
     accent: "#8b83d9",
     brief: "Players mid-tune-up, conductor's baton raised, not yet in unison.",
   },
   {
     id: "jazz",
     name: "Jazz Quartet",
-    src: null,
+    src: "/cards/jazz.svg",
     accent: "#8b83d9",
     brief: "Four players improvising, one soloing while the others hold the groove.",
   },
   {
     id: "relay",
     name: "The Relay Handoff",
-    src: null,
+    src: "/cards/relay.svg",
     accent: "#7fb383",
     brief: "Baton passing between two runners in the exchange zone.",
   },
   {
     id: "pit-crew",
     name: "The Pit Crew",
-    src: null,
+    src: "/cards/pit-crew.svg",
     accent: "#d4699c",
     brief: "Crew swarming a car in perfect choreography, stopwatch running.",
   },
   {
     id: "murmuration",
     name: "Murmuration",
-    src: null,
+    src: "/cards/murmuration.svg",
     accent: "#7fb0d4",
     brief: "A flock of birds turning as one shape, no visible leader.",
   },
@@ -193,14 +192,14 @@ export const metaphorCards = [
   {
     id: "greenhouse",
     name: "The Greenhouse",
-    src: null,
+    src: "/cards/greenhouse.svg",
     accent: "#7fb383",
     brief: "Plants at different stages under glass, someone watering.",
   },
   {
     id: "scaffolding",
     name: "Scaffolding Coming Down",
-    src: null,
+    src: "/cards/scaffolding.svg",
     accent: "#d9a441",
     brief: "A finished structure with scaffolding half removed, standing on its own.",
   },
@@ -209,28 +208,28 @@ export const metaphorCards = [
   {
     id: "safety-net",
     name: "The Net Below the Wire",
-    src: null,
+    src: "/cards/safety-net.svg",
     accent: "#7fb383",
     brief: "Tightrope walker crossing confidently, a net stretched below.",
   },
   {
     id: "telephone-game",
     name: "The Telephone Game",
-    src: null,
+    src: "/cards/telephone-game.svg",
     accent: "#d4699c",
     brief: "A whisper chain where the first and last speech bubbles differ wildly.",
   },
   {
     id: "through-glass",
     name: "Talking Through Glass",
-    src: null,
+    src: "/cards/through-glass.svg",
     accent: "#7fb0d4",
     brief: "Two figures mouthing at each other through a pane, hands pressed flat.",
   },
   {
     id: "radio-silence",
     name: "Radio Silence",
-    src: null,
+    src: "/cards/radio-silence.svg",
     accent: "#7fb0d4",
     brief: "A figure with a transmitter, empty speech bubbles, no reply coming back.",
   },

@@ -3,23 +3,12 @@
 import { useState } from "react";
 import { Check } from "lucide-react";
 import { metaphorCards, parsePickDescription } from "@/lib/metaphorCards";
+import CardArt from "@/components/CardArt";
 import styles from "./MetaphorCards.module.css";
 
-// Cards still awaiting illustration show their name hand-lettered on the same
-// black card, so the deck is fully usable before the art lands.
-function CardArt({ card }) {
-  if (card.src) {
-    return <img className={styles.art} src={card.src} alt="" draggable={false} />;
-  }
-  return (
-    <span className={styles.artFallback} style={{ "--accent": card.accent }}>
-      {card.name}
-    </span>
-  );
-}
-
 // Image-only deck: pick the image that fits, give it your own name, say why,
-// and save. Picks surface anonymously in Awareness — no team list here.
+// and save. The chosen card enlarges beside the prompts. Picks surface
+// anonymously in Awareness — no team list here.
 export default function MetaphorCards({ currentMember, picks, onSave }) {
   const saved = currentMember ? picks[currentMember.id] : null;
   const savedParsed = saved ? parsePickDescription(saved.description) : null;
@@ -58,27 +47,10 @@ export default function MetaphorCards({ currentMember, picks, onSave }) {
         Pick the image that best describes your experience on this team.
       </div>
 
-      <div className={styles.deck}>
-        {metaphorCards.map((card) => (
-          <button
-            key={card.id}
-            type="button"
-            className={styles.cardButton}
-            data-selected={cardId === card.id}
-            onClick={() => currentMember && setCardId(card.id)}
-            disabled={!currentMember}
-            aria-label={card.name}
-            title={card.name}
-          >
-            <CardArt card={card} />
-          </button>
-        ))}
-      </div>
-
       {selectedCard && (
         <div className={styles.saveArea}>
           <span className={styles.chosenCard}>
-            <CardArt card={selectedCard} />
+            <CardArt card={selectedCard} className={styles.chosenArt} />
           </span>
           <div className={styles.saveFields}>
             <div className={styles.field}>
@@ -116,6 +88,23 @@ export default function MetaphorCards({ currentMember, picks, onSave }) {
           </div>
         </div>
       )}
+
+      <div className={styles.deck}>
+        {metaphorCards.map((card) => (
+          <button
+            key={card.id}
+            type="button"
+            className={styles.cardButton}
+            data-selected={cardId === card.id}
+            onClick={() => currentMember && setCardId(card.id)}
+            disabled={!currentMember}
+            aria-label={card.name}
+            title={card.name}
+          >
+            <CardArt card={card} className={styles.art} />
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

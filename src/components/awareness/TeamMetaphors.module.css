@@ -14,14 +14,14 @@
 }
 
 .title {
-  font-size: 13px;
+  font-size: var(--fs-title);
   color: var(--text);
   font-weight: 500;
   margin-bottom: 4px;
 }
 
 .sub {
-  font-size: 11px;
+  font-size: var(--fs-sub);
   color: var(--text-dim);
   line-height: 1.5;
   max-width: 460px;
@@ -35,7 +35,7 @@
 }
 
 .counter {
-  font-size: 12px;
+  font-size: 20px;
   color: var(--text-dim);
   min-width: 40px;
   text-align: right;
@@ -75,7 +75,7 @@
 /* Black cards with white line art, matching the Discover deck. */
 .bigCard {
   flex: none;
-  width: min(280px, 72%);
+  width: min(330px, 76%);
   scroll-snap-align: center;
   background: #000;
   border: 1px solid #2e2f31;
@@ -117,7 +117,7 @@
 
 .artFallback {
   font-family: var(--font-hand), cursive;
-  font-size: 24px;
+  font-size: 30px;
   line-height: 1.15;
   color: #fff;
   text-align: center;
@@ -125,7 +125,7 @@
 
 .cardName {
   font-family: var(--font-hand), cursive;
-  font-size: 26px;
+  font-size: 32px;
   line-height: 1.1;
   color: #fff;
   border-bottom: 3px solid var(--card-accent);
@@ -135,7 +135,7 @@
 
 .quote {
   margin-top: 2px;
-  font-size: 13px;
+  font-size: 20px;
   color: #b6b4b0;
   font-style: italic;
   line-height: 1.6;

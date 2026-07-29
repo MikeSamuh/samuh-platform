@@ -13,8 +13,8 @@
 }
 
 .iconBox {
-  width: 34px;
-  height: 34px;
+  width: 44px;
+  height: 44px;
   border-radius: 8px;
   background: var(--chip);
   display: flex;
@@ -25,12 +25,12 @@
 }
 
 .title {
-  font-size: 14px;
+  font-size: var(--fs-title);
   color: var(--text);
 }
 
 .sub {
-  font-size: 11px;
+  font-size: var(--fs-sub);
   color: var(--text-dim);
 }
 
@@ -41,7 +41,7 @@
   flex-direction: column;
   gap: 6px;
   margin-bottom: 14px;
-  font-size: 12px;
+  font-size: 20px;
   color: var(--text-dim);
   line-height: 1.55;
 }
@@ -65,7 +65,7 @@
   border: 1px solid var(--border);
   border-radius: 15px;
   padding: 6px 10px 6px 12px;
-  font-size: 13px;
+  font-size: 20px;
   color: var(--text);
 }
 
@@ -88,12 +88,12 @@
 }
 
 .empty {
-  font-size: 12px;
+  font-size: 20px;
   color: var(--text-faint);
 }
 
 .fullNote {
-  font-size: 12px;
+  font-size: 20px;
   color: var(--band-thriving);
 }
 
@@ -108,7 +108,7 @@
   border: 1px solid var(--border);
   border-radius: 8px;
   color: var(--text);
-  font-size: 13px;
+  font-size: 20px;
   padding: 8px 11px;
   outline: none;
   cursor: pointer;
@@ -124,7 +124,7 @@
   border: 1px solid var(--border);
   border-radius: 8px;
   color: var(--text);
-  font-size: 13px;
+  font-size: 20px;
   padding: 8px 14px;
   cursor: pointer;
 }

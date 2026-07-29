@@ -3,11 +3,11 @@
   flex-direction: column;
   gap: 20px;
   padding: 8px 48px 48px;
-  max-width: 960px;
+  max-width: 1180px;
 }
 
 .eyebrow {
-  font-size: 11px;
+  font-size: var(--fs-eyebrow);
   color: var(--text-faint);
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -21,14 +21,14 @@
 }
 
 .cardTitle {
-  font-size: 13px;
+  font-size: var(--fs-title);
   color: var(--text);
   font-weight: 500;
   margin-bottom: 4px;
 }
 
 .cardSub {
-  font-size: 12px;
+  font-size: var(--fs-sub);
   color: var(--text-dim);
   line-height: 1.55;
   margin-bottom: 12px;
@@ -44,7 +44,7 @@
 }
 
 .faqItem summary {
-  font-size: 13px;
+  font-size: 20px;
   color: var(--text);
   cursor: pointer;
   list-style: none;
@@ -57,7 +57,7 @@
 .faqItem summary::after {
   content: "+";
   color: var(--text-faint);
-  font-size: 15px;
+  font-size: 22px;
 }
 
 .faqItem[open] summary::after {
@@ -66,7 +66,7 @@
 
 .faqAnswer {
   margin-top: 8px;
-  font-size: 12px;
+  font-size: 20px;
   color: var(--text-dim);
   line-height: 1.6;
 }
@@ -81,7 +81,7 @@
   background: var(--inset);
   border-radius: 8px;
   padding: 10px 13px;
-  font-size: 13px;
+  font-size: 20px;
   color: var(--text);
   font-style: italic;
   line-height: 1.5;
@@ -99,7 +99,7 @@
   border: 1px solid var(--border);
   border-radius: 8px;
   color: var(--text);
-  font-size: 13px;
+  font-size: 20px;
   padding: 8px 11px;
   outline: none;
   cursor: pointer;
@@ -110,14 +110,14 @@
 }
 
 .hint {
-  font-size: 11px;
+  font-size: 20px;
   color: var(--text-faint);
   line-height: 1.5;
   margin-top: 10px;
 }
 
 .emptyState {
-  font-size: 13px;
+  font-size: 20px;
   color: var(--text-dim);
   line-height: 1.6;
 }
@@ -125,12 +125,12 @@
 .table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13px;
+  font-size: 20px;
 }
 
 .table th {
   text-align: left;
-  font-size: 10px;
+  font-size: 20px;
   color: var(--text-faint);
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -155,7 +155,7 @@
   border: 1px solid var(--border);
   border-radius: 8px;
   color: var(--text);
-  font-size: 13px;
+  font-size: 20px;
   padding: 7px 10px;
   outline: none;
 }
@@ -169,7 +169,7 @@
   border: 1px solid var(--border);
   border-radius: 8px;
   color: var(--text-faint);
-  font-size: 12px;
+  font-size: 20px;
   padding: 7px 12px;
   cursor: not-allowed;
 }
@@ -179,7 +179,7 @@
   border: 1px solid rgba(232, 138, 42, 0.35);
   color: #eab98a;
   border-radius: 8px;
-  font-size: 12px;
+  font-size: 20px;
   line-height: 1.55;
   padding: 10px 13px;
 }
