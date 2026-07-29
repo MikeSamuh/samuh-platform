@@ -6,6 +6,7 @@ import { steps } from "@/lib/steps";
 import { stepTasks } from "@/lib/stepTasks";
 
 const EMPTY = {
+  team: null,
   members: [],
   coLead: null,
   ritualKeeper: null,
@@ -52,7 +53,8 @@ export function useTeamData(teamId, userId) {
       return;
     }
 
-    const [members, teamState, progress, picks, votes, reflections, notes] = await Promise.all([
+    const [teamRow, members, teamState, progress, picks, votes, reflections, notes] = await Promise.all([
+      supabase.from("teams").select("*").eq("id", teamId).maybeSingle(),
       supabase.from("members").select("*").eq("team_id", teamId).order("created_at"),
       supabase.from("team_state").select("*").eq("team_id", teamId).maybeSingle(),
       supabase.from("step_progress").select("*").eq("team_id", teamId),
@@ -63,6 +65,7 @@ export function useTeamData(teamId, userId) {
     ]);
 
     setData({
+      team: teamRow.data || null,
       members: members.data || [],
       coLead: teamState.data?.co_lead_member_id || null,
       ritualKeeper: teamState.data?.ritual_keeper_member_id || null,
@@ -94,6 +97,13 @@ export function useTeamData(teamId, userId) {
   }
 
   const actions = {
+    async renameTeam(name) {
+      const trimmed = name.trim();
+      if (!trimmed) return;
+      setData((d) => ({ ...d, team: { ...d.team, name: trimmed } }));
+      await supabase.from("teams").update({ name: trimmed }).eq("id", teamId);
+    },
+
     async addMember({ name, email = "", tenure = "" }) {
       if (!name?.trim()) return;
       const { data: row } = await supabase

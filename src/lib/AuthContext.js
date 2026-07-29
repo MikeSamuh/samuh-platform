@@ -14,6 +14,7 @@ export function useAuth() {
 export function AuthProvider({ children }) {
   const [session, setSession] = useState(null);
   const [profile, setProfile] = useState(null);
+  const [profileMissing, setProfileMissing] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const loadProfile = useCallback(async (userId) => {
@@ -23,6 +24,7 @@ export function AuthProvider({ children }) {
       .eq("id", userId)
       .maybeSingle();
     setProfile(data || null);
+    setProfileMissing(!data);
     return data || null;
   }, []);
 
@@ -48,6 +50,7 @@ export function AuthProvider({ children }) {
         await loadProfile(next.user.id);
       } else {
         setProfile(null);
+        setProfileMissing(false);
       }
     });
 
@@ -60,6 +63,7 @@ export function AuthProvider({ children }) {
   const value = {
     session,
     profile,
+    profileMissing,
     loading,
     user: session?.user || null,
     isStaff: profile?.role === "samuh_admin",

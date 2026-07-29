@@ -1,0 +1,37 @@
+.name,
+.button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.button {
+  cursor: pointer;
+}
+
+.pencil {
+  color: var(--text-faint);
+}
+
+.button:hover .pencil {
+  color: var(--text-dim);
+}
+
+.input {
+  background: var(--inset);
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  padding: 3px 8px;
+  outline: none;
+  min-width: 180px;
+}

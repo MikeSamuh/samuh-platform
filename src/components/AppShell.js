@@ -11,6 +11,7 @@ import PathNavigator from "@/components/PathNavigator";
 import StepChecklist from "@/components/StepChecklist";
 import AdminDashboard from "@/components/AdminDashboard";
 import GuidedTour from "@/components/GuidedTour";
+import TeamName from "@/components/TeamName";
 import PreparePanel from "@/components/panels/PreparePanel";
 import LaunchPanel from "@/components/panels/LaunchPanel";
 import AwarenessPanel from "@/components/panels/AwarenessPanel";
@@ -27,7 +28,7 @@ const panels = {
 };
 
 export default function AppShell() {
-  const { profile, isStaff, signOut } = useAuth();
+  const { profile, isStaff, isManager, signOut } = useAuth();
   const team = useTeamData(profile?.team_id, profile?.id);
 
   const [activeStepId, setActiveStepId] = useState(steps[0].id);
@@ -83,6 +84,9 @@ export default function AppShell() {
             priority
           />
           <div className={styles.account}>
+            {!isStaff && (
+              <TeamName team={team.team} canRename={isManager} onRename={team.renameTeam} />
+            )}
             <span className={styles.accountName}>
               {profile?.full_name || profile?.email}
               {isStaff && <span className={styles.staffBadge}>Samuh</span>}
