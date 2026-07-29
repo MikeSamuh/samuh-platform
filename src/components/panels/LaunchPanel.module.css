@@ -39,3 +39,32 @@
     grid-template-columns: 1fr;
   }
 }
+
+.statusRow {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.statusRow .status {
+  flex: 1;
+  min-width: 220px;
+}
+
+.relaunchButton {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--chip);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 13px;
+  padding: 0 15px;
+  cursor: pointer;
+}
+
+.relaunchButton:hover {
+  border-color: var(--text-faint);
+}

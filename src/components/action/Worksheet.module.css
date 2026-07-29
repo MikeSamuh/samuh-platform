@@ -49,6 +49,7 @@
 }
 
 .board {
+  position: relative;
   display: grid;
   grid-template-columns: 1.6fr 1fr;
   grid-template-rows: minmax(120px, auto) minmax(120px, auto) minmax(170px, auto) minmax(220px, 1fr);
@@ -168,15 +169,129 @@
 }
 
 .text {
-  font-family: var(--font-hand), cursive;
-  font-size: 19px;
-  line-height: 1.2;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text);
   outline: none;
-  min-height: 20px;
+  min-height: 18px;
   cursor: text;
 }
 
 .postAsLabel {
   font-size: 11px;
   color: var(--text-dim);
+}
+
+
+.note[data-dragging] {
+  position: absolute;
+  z-index: 30;
+  pointer-events: none;
+  background: var(--card);
+  border: 1px solid var(--accent);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.zone[data-drop] .zoneHeader {
+  background: rgba(74, 158, 255, 0.08);
+}
+
+.practiceBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.practicePicker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.practiceLabel {
+  font-size: 11px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  flex: none;
+}
+
+.selectWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.practiceSelect {
+  appearance: none;
+  background: var(--inset);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 32px 8px 12px;
+  outline: none;
+  cursor: pointer;
+  max-width: 340px;
+}
+
+.practiceSelect:focus {
+  border-color: var(--accent);
+}
+
+.selectChevron {
+  position: absolute;
+  right: 10px;
+  color: var(--text-dim);
+  pointer-events: none;
+}
+
+.newPracticeButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--chip);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 12px;
+  padding: 7px 12px;
+  cursor: pointer;
+}
+
+.newPracticeRow {
+  display: flex;
+  gap: 8px;
+}
+
+.newPracticeInput {
+  background: var(--inset);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 13px;
+  padding: 7px 11px;
+  outline: none;
+  min-width: 200px;
+}
+
+.newPracticeInput:focus {
+  border-color: var(--accent);
+}
+
+.newPracticeSave {
+  background: var(--accent-button);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 7px 13px;
+  cursor: pointer;
 }

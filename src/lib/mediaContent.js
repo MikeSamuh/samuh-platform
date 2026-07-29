@@ -60,13 +60,6 @@ export const awarenessMedia = [
     src: null,
   },
   {
-    id: "read-results",
-    name: "How to read & communicate your results",
-    type: "video",
-    meta: "How-to",
-    src: null,
-  },
-  {
     id: "share-reflect",
     name: "Sharing & reflecting on results in a meeting",
     type: "pdf",
@@ -101,6 +94,13 @@ export const belongingMedia = [
 
 export const actionMedia = [
   {
+    id: "make-it-stick",
+    name: "Best practices to make it stick",
+    type: "video",
+    meta: "How-to",
+    src: null,
+  },
+  {
     id: "take-forward",
     name: "Taking it forward with Samuh",
     type: "video",
@@ -108,10 +108,10 @@ export const actionMedia = [
     src: null,
   },
   {
-    id: "make-it-stick",
-    name: "Best practices to make it stick",
-    type: "video",
-    meta: "How-to",
+    id: "closing",
+    name: "How to close",
+    type: "pdf",
+    meta: "A guide to closing well",
     src: null,
   },
 ];

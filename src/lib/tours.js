@@ -68,14 +68,19 @@ export const tours = {
       body: "The team's score, capacity to perform, and performance loss — the readout you'll unpack together.",
     },
     {
+      target: "metaphors",
+      title: "Your team in metaphors",
+      body: "The cards everyone chose on Launch, and why — a picture of how the team feels, in the team's own words.",
+    },
+    {
       target: "media",
       title: "Make sense of it",
-      body: "Keystone practices, how to read and communicate results, and how to share and reflect on them in a meeting.",
+      body: "Keystone practices, plus how to share and reflect on your results in a meeting.",
     },
     {
       target: "charts",
       title: "Vote on the results",
-      body: "Team environment and team practices, scored 1–9. Click the star next to a row to vote for what matters most to you.",
+      body: "You get one star for Team environment and one for Team practices. Click the star next to the row that matters most; click again to move it. The practice with the most stars seeds your practice canvas.",
     },
     {
       target: "reflections",
@@ -98,18 +103,18 @@ export const tours = {
   action: [
     {
       target: "worksheet",
-      title: "The collective worksheet",
-      body: "Capture your ritual on the canvas — what, why, when, who, how, and prep. Add notes and drag them anywhere.",
+      title: "The practice canvas",
+      body: "Design a ritual around a practice — it opens on the practice your team gave the most stars, and the dropdown switches or adds practices, each with its own canvas.",
+    },
+    {
+      target: "keeper",
+      title: "Ritual keepers",
+      body: "Choose exactly two teammates to keep the ritual alive. It's a rotating three-month role — pick people the team trusts to gently hold the routine.",
     },
     {
       target: "media",
       title: "Make it stick",
-      body: "How to take it forward with Samuh, and best practices to keep the ritual alive.",
-    },
-    {
-      target: "keeper",
-      title: "Ritual keeper",
-      body: "Choose the team member who keeps the ritual alive after this journey ends.",
+      body: "How to take it forward with Samuh, best practices to keep the ritual alive, and a guide to closing well.",
     },
   ],
 };

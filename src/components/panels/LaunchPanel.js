@@ -1,6 +1,7 @@
 "use client";
 
-import { Play } from "lucide-react";
+import { useState } from "react";
+import { Play, RotateCcw } from "lucide-react";
 import MediaAccordion from "@/components/MediaAccordion";
 import MetaphorCards from "@/components/launch/MetaphorCards";
 import CoachingCard from "@/components/CoachingCard";
@@ -12,6 +13,7 @@ import styles from "./LaunchPanel.module.css";
 
 export default function LaunchPanel({ team, currentMember, completeTask }) {
   const authors = getAuthors(team.members);
+  const [relaunched, setRelaunched] = useState(false);
 
   return (
     <div className={panelStyles.panel}>
@@ -24,9 +26,23 @@ export default function LaunchPanel({ team, currentMember, completeTask }) {
 
       <div data-tour="launch">
         {team.launched ? (
-          <div className={styles.status}>
-            TeamQ+ launched &middot; {team.members.length} of {team.members.length} invited, 0
-            responded
+          <div className={styles.statusRow}>
+            <div className={styles.status}>
+              TeamQ+ launched &middot; {team.members.length} of {team.members.length} invited, 0
+              responded
+            </div>
+            <button
+              type="button"
+              className={styles.relaunchButton}
+              onClick={async () => {
+                await team.relaunchSurvey();
+                setRelaunched(true);
+                setTimeout(() => setRelaunched(false), 2500);
+              }}
+            >
+              <RotateCcw size={14} />
+              {relaunched ? "Survey relaunched" : "Relaunch survey"}
+            </button>
           </div>
         ) : (
           <button

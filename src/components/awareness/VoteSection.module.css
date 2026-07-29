@@ -1,0 +1,55 @@
+.wrap {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.iconBox {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: var(--chip);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  color: #e8c34a;
+}
+
+.title {
+  font-size: 13px;
+  color: var(--text);
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.instructions {
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.55;
+}
+
+.instructions strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.charts {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* The charts keep their own card styling; soften it inside the section. */
+.charts > div {
+  background: var(--inset);
+  border: none;
+}

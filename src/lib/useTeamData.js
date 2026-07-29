@@ -153,10 +153,55 @@ export function useTeamData(teamId, userId) {
       if (memberId) await actions.completeTask("prepare", "colead");
     },
 
-    async setRitualKeeper(memberId) {
-      setData((d) => ({ ...d, ritualKeeper: memberId }));
-      await ensureTeamState({ ritual_keeper_member_id: memberId });
-      if (memberId) await actions.completeTask("action", "ritual-keeper");
+    // Exactly two ritual keepers. Stored as step_progress rows under the
+    // reserved "ritual-keepers" step id (no schema change available); the
+    // first keeper is mirrored into team_state so the admin milestone works.
+    async addRitualKeeper(memberId) {
+      const current = data.taskChecks["ritual-keepers"] || [];
+      if (!memberId || current.includes(memberId) || current.length >= 2) return;
+      await actions.completeTask("ritual-keepers", memberId);
+      if (current.length === 0) {
+        setData((d) => ({ ...d, ritualKeeper: memberId }));
+        await ensureTeamState({ ritual_keeper_member_id: memberId });
+      }
+      if (current.length + 1 === 2) {
+        await actions.completeTask("action", "ritual-keeper");
+      }
+    },
+
+    async removeRitualKeeper(memberId) {
+      const current = data.taskChecks["ritual-keepers"] || [];
+      if (!current.includes(memberId)) return;
+      await actions.uncompleteTask("ritual-keepers", memberId);
+      await actions.uncompleteTask("action", "ritual-keeper");
+      const remaining = current.filter((id) => id !== memberId);
+      const mirror = remaining[0] || null;
+      setData((d) => ({ ...d, ritualKeeper: mirror }));
+      await ensureTeamState({ ritual_keeper_member_id: mirror });
+    },
+
+    // Custom practices added to the canvas, same storage trick.
+    async addCanvasPractice(name) {
+      const trimmed = name.trim();
+      if (!trimmed) return;
+      await actions.completeTask("canvas-practices", trimmed);
+    },
+
+    async relaunchSurvey() {
+      await ensureTeamState({
+        launched: true,
+        launched_at: new Date().toISOString(),
+      });
+    },
+
+    async setFeedbackCadence(cadence) {
+      const current = data.taskChecks["feedback-emails"] || [];
+      for (const existing of current) {
+        await actions.uncompleteTask("feedback-emails", existing);
+      }
+      if (cadence && cadence !== "off") {
+        await actions.completeTask("feedback-emails", cadence);
+      }
     },
 
     async setLaunched(value) {
@@ -321,6 +366,13 @@ export function useTeamData(teamId, userId) {
     }
   }
 
+  // Legacy single keeper (team_state) folds into the two-keeper list.
+  const ritualKeepers = (data.taskChecks["ritual-keepers"] || []).length
+    ? data.taskChecks["ritual-keepers"]
+    : data.ritualKeeper
+      ? [data.ritualKeeper]
+      : [];
+
   return {
     ...data,
     loading,
@@ -329,6 +381,9 @@ export function useTeamData(teamId, userId) {
     currentMember,
     unlockedIndex,
     isStepComplete,
+    ritualKeepers,
+    canvasPractices: data.taskChecks["canvas-practices"] || [],
+    feedbackCadence: (data.taskChecks["feedback-emails"] || [])[0] || "off",
     reload: load,
     ...actions,
   };

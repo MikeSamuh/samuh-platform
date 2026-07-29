@@ -25,7 +25,6 @@ export const stepTasks = {
     { id: "tour", label: "Take the virtual walkthrough of this step" },
     { id: "keystone-video", label: "Watch the Keystone practices overview" },
     { id: "keystone-pdf", label: "Read the Keystone practices guide" },
-    { id: "read-results", label: "Learn how to read & communicate your results" },
     { id: "share-reflect", label: "Review sharing & reflecting in a meeting" },
     { id: "vote", label: "Vote on the results" },
     { id: "reflect", label: "Share a note or reflection" },
@@ -38,9 +37,10 @@ export const stepTasks = {
   ],
   action: [
     { id: "tour", label: "Take the virtual walkthrough of this step" },
-    { id: "worksheet", label: "Add to the collective worksheet" },
-    { id: "take-forward", label: "Watch how to take it forward with Samuh" },
-    { id: "ritual-keeper", label: "Select a ritual keeper" },
+    { id: "worksheet", label: "Add to the practice canvas" },
+    { id: "ritual-keeper", label: "Select two ritual keepers" },
     { id: "make-it-stick", label: "Watch best practices to make it stick" },
+    { id: "take-forward", label: "Watch how to take it forward with Samuh" },
+    { id: "closing", label: "Review the closing guide" },
   ],
 };

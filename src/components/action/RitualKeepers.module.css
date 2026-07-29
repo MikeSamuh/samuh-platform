@@ -1,0 +1,135 @@
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.iconBox {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: var(--chip);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  color: var(--band-struggling);
+}
+
+.title {
+  font-size: 14px;
+  color: var(--text);
+}
+
+.sub {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.guidance {
+  list-style: disc;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.55;
+}
+
+.guidance strong {
+  color: var(--text);
+}
+
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--chip);
+  border: 1px solid var(--border);
+  border-radius: 15px;
+  padding: 6px 10px 6px 12px;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.pillFlame {
+  color: var(--band-struggling);
+}
+
+.pillRemove {
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  color: var(--text-faint);
+  cursor: pointer;
+  padding: 0;
+}
+
+.pillRemove:hover {
+  color: var(--text);
+}
+
+.empty {
+  font-size: 12px;
+  color: var(--text-faint);
+}
+
+.fullNote {
+  font-size: 12px;
+  color: var(--band-thriving);
+}
+
+.addRow {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.select {
+  background: var(--inset);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 13px;
+  padding: 8px 11px;
+  outline: none;
+  cursor: pointer;
+  min-width: 190px;
+}
+
+.select:focus {
+  border-color: var(--accent);
+}
+
+.addButton {
+  background: var(--chip);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 13px;
+  padding: 8px 14px;
+  cursor: pointer;
+}
+
+.addButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

@@ -11,6 +11,9 @@ import IconRail from "@/components/IconRail";
 import PathNavigator from "@/components/PathNavigator";
 import StepChecklist from "@/components/StepChecklist";
 import AdminDashboard from "@/components/AdminDashboard";
+import ReadinessKit from "@/components/views/ReadinessKit";
+import Notifications from "@/components/views/Notifications";
+import SurveyLinks from "@/components/views/SurveyLinks";
 import GuidedTour from "@/components/GuidedTour";
 import TeamName from "@/components/TeamName";
 import TourCard from "@/components/TourCard";
@@ -76,11 +79,17 @@ export default function AppShell() {
     setView("journey");
   }
 
+  function selectView(id) {
+    if ((id === "admin" || id === "surveys") && !isStaff) return;
+    setView(id);
+    setTourActive(false);
+  }
+
   if (team.loading && !isStaff) return null;
 
   return (
     <div className={styles.shell}>
-      <IconRail view={view} onSelectView={setView} showAdmin={isStaff} />
+      <IconRail view={view} onSelectView={selectView} showAdmin={isStaff} />
       <div className={styles.main}>
         <div className={styles.header}>
           <div className={styles.brand}>
@@ -111,7 +120,13 @@ export default function AppShell() {
           </div>
         )}
 
-        {view === "admin" && isStaff ? (
+        {view === "kit" ? (
+          <ReadinessKit team={team} isStaff={isStaff} />
+        ) : view === "notifications" ? (
+          <Notifications team={team} isStaff={isStaff} />
+        ) : view === "surveys" && isStaff ? (
+          <SurveyLinks />
+        ) : view === "admin" && isStaff ? (
           <AdminDashboard />
         ) : isStaff ? (
           // Samuh staff belong to no team, so the journey has nothing to read
