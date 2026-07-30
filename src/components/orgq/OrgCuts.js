@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Layers, Plus, X, Undo2 } from "lucide-react";
+import { Layers, Plus, X } from "lucide-react";
 import {
   allCutFields,
   cutsFor,
@@ -35,8 +35,6 @@ export default function OrgCuts({
   onRemoveValue,
 }) {
   const [draft, setDraft] = useState("");
-  // Which value is selected in each cut's add picker.
-  const [valueDraft, setValueDraft] = useState({});
 
   const groups = allCutFields(cutFields, hiddenCuts).map((f) => ({
     ...f,
@@ -57,13 +55,6 @@ export default function OrgCuts({
     if (!trimmed || taken.has(trimmed.toLowerCase())) return;
     await onAddField(trimmed);
     setDraft("");
-  }
-
-  async function addValue(field) {
-    const value = valueDraft[field];
-    if (!value) return;
-    await onAddValue(field, value);
-    setValueDraft((d) => ({ ...d, [field]: "" }));
   }
 
   return (
@@ -103,6 +94,9 @@ export default function OrgCuts({
             </button>
           </div>
 
+          {/* Every group in the cut as one pill. Included ones carry their
+              count and an X; excluded ones are dimmed and click to come back.
+              Nothing to type, and the full set is visible at a glance. */}
           <div className={styles.chips}>
             {g.cuts.map((c) => (
               <span key={c.value} className={styles.chip}>
@@ -119,59 +113,45 @@ export default function OrgCuts({
                 </button>
               </span>
             ))}
-            {g.cuts.length === 0 && (
+            {g.removed.map((v) => (
+              <button
+                key={v}
+                type="button"
+                className={styles.chip}
+                data-off="true"
+                onClick={() => onAddValue(g.key, v)}
+                aria-label={`Add ${v} back to ${g.label}`}
+                title={`Add ${v} back`}
+              >
+                <Plus size={12} />
+                {v}
+              </button>
+            ))}
+            {g.cuts.length === 0 && g.removed.length === 0 && (
               <span className={styles.sub}>
                 Nothing yet — fill in the {g.label} column on the roster and the
                 groups will appear here.
               </span>
             )}
           </div>
-
-          {/* Only groups the roster actually contains can be added, so this is
-              a picker over removed values rather than a free-text field. */}
-          {g.removed.length > 0 && (
-            <div className={styles.valueAddRow}>
-              <select
-                className={styles.select}
-                value={valueDraft[g.key] || ""}
-                onChange={(e) =>
-                  setValueDraft((d) => ({ ...d, [g.key]: e.target.value }))
-                }
-                aria-label={`Add a group back to ${g.label}`}
-              >
-                <option value="">Add back a removed {g.label.toLowerCase()}…</option>
-                {g.removed.map((v) => (
-                  <option key={v} value={v}>
-                    {v}
-                  </option>
-                ))}
-              </select>
-              <button
-                type="button"
-                className={styles.button}
-                onClick={() => addValue(g.key)}
-                disabled={!valueDraft[g.key]}
-              >
-                <Undo2 size={12} />
-                Add
-              </button>
-            </div>
-          )}
         </div>
       ))}
 
       {hiddenFields.length > 0 && (
         <div className={styles.cutGroup}>
-          <div className={styles.cutLabel}>Removed cuts — put back any time</div>
+          <div className={styles.cutLabel}>Removed cuts</div>
           <div className={styles.chips}>
             {hiddenFields.map((h) => (
               <button
                 key={h.key}
                 type="button"
                 className={styles.chip}
+                data-off="true"
                 onClick={() => onRestoreCut(h.key)}
+                aria-label={`Add the ${h.label} cut back`}
+                title={`Add ${h.label} back`}
               >
-                <Undo2 size={12} />
+                <Plus size={12} />
                 {h.label}
               </button>
             ))}
@@ -215,8 +195,8 @@ export default function OrgCuts({
           </div>
         )}
         <div className={styles.hint}>
-          Removing a cut or a group only changes what you report on — the roster
-          keeps every value, so putting either back brings the numbers with it.
+          Click a pill&apos;s × to leave a group out of your reporting, or a dimmed
+          pill to bring it back. The roster keeps every value either way.
         </div>
       </div>
     </div>
