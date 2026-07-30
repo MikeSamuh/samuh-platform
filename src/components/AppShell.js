@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { steps } from "@/lib/steps";
 import { stepTasks } from "@/lib/stepTasks";
@@ -39,6 +39,19 @@ const panels = {
 // journey at Discover.
 const MEMBER_HIDDEN_STEPS = ["prepare", "launch"];
 
+// Where each person last was, so a refresh doesn't send them back to step one.
+// Keyed per profile so switching roles doesn't inherit the other's place.
+const navKey = (profileId) => `ritualizer:nav:${profileId}`;
+
+function readSavedNav(profileId) {
+  if (!profileId || typeof window === "undefined") return null;
+  try {
+    return JSON.parse(window.localStorage.getItem(navKey(profileId))) || null;
+  } catch {
+    return null;
+  }
+}
+
 export default function AppShell() {
   const { profile, isStaff, isManager } = useAuth();
   const team = useTeamData(profile?.team_id, profile?.id);
@@ -64,11 +77,39 @@ export default function AppShell() {
     }
   }
 
-  // Staff land on the dashboard; switching roles resets the view sensibly.
+  // Restore the last place on load / profile switch, falling back to the
+  // sensible default for the role. Waits for team data so a restored step
+  // isn't rejected by unlock rules that haven't loaded yet.
   useEffect(() => {
-    setView(isStaff ? "admin" : "journey");
+    if (!profile?.id || team.loading) return;
+    const saved = readSavedNav(profile.id);
+    const savedStepOk =
+      saved?.activeStepId && visibleSteps.some((s) => s.id === saved.activeStepId);
+    const savedViewOk =
+      saved?.view &&
+      (saved.view === "journey" ||
+        saved.view === "kit" ||
+        saved.view === "notifications" ||
+        ((saved.view === "admin" || saved.view === "surveys") && isStaff));
+
+    setView(savedViewOk ? saved.view : isStaff ? "admin" : "journey");
+    if (savedStepOk) setActiveStepId(saved.activeStepId);
     setTourActive(false);
-  }, [isStaff, profile?.id]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile?.id, isStaff, team.loading]);
+
+  // Remember it whenever it changes.
+  useEffect(() => {
+    if (!profile?.id || team.loading) return;
+    try {
+      window.localStorage.setItem(
+        navKey(profile.id),
+        JSON.stringify({ activeStepId, view })
+      );
+    } catch {
+      // Private-mode storage failures shouldn't break navigation.
+    }
+  }, [profile?.id, activeStepId, view, team.loading]);
 
   // A role switch can leave the active step outside this role's list.
   useEffect(() => {
@@ -80,9 +121,17 @@ export default function AppShell() {
 
   // Advance whenever the active step's checklist fills up, no matter which
   // path completed the last task (checkbox, media open, co-lead select,
-  // team rename — several complete tasks inside the data layer).
+  // team rename — several complete tasks inside the data layer). Only fires
+  // on a real task change, so restoring a finished step on refresh doesn't
+  // immediately bounce the user forward.
+  const seenChecks = useRef(null);
   useEffect(() => {
     if (view !== "journey" || team.loading) return;
+    const signature = JSON.stringify(team.taskChecks);
+    const firstPass = seenChecks.current === null;
+    const unchanged = seenChecks.current === signature;
+    seenChecks.current = signature;
+    if (firstPass || unchanged) return;
     if (!team.isStepComplete(activeStepId)) return;
     const index = visibleSteps.findIndex((s) => s.id === activeStepId);
     if (index !== -1 && index < visibleSteps.length - 1) {

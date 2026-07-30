@@ -1,3 +1,8 @@
+:root,
+.shell {
+  --logo-h: 28px;
+}
+
 .shell {
   display: flex;
   min-height: 100vh;
@@ -21,7 +26,7 @@
 }
 
 .logo {
-  height: 28px;
+  height: var(--logo-h);
   width: auto;
 }
 
@@ -162,7 +167,8 @@
 
 .appTitle {
   font-family: var(--font-serif), Georgia, serif;
-  font-size: var(--fs-title);
+  /* Sized to match the logo's cap height (--logo-h), not the type scale. */
+  font-size: calc(var(--logo-h) * 1.02);
   color: var(--text);
   letter-spacing: 0.02em;
   border-left: 1px solid var(--border);
@@ -170,9 +176,11 @@
   line-height: 1.2;
 }
 
+/* Matches .panel in Panel.module.css so the tour card lines up with the
+   cards below it. */
 .tourSlot {
   padding: 8px 48px 12px;
-  max-width: 960px;
+  max-width: 1020px;
 }
 
 @media (max-width: 760px) {
@@ -188,12 +196,12 @@
   }
 
   .appTitle {
-    font-size: var(--fs-title);
     padding-left: 10px;
   }
 
-  .logo {
-    height: 22px;
+  .shell,
+  .header {
+    --logo-h: 22px;
   }
 
   .account {
@@ -219,5 +227,6 @@
 
   .tourSlot {
     padding: 8px 16px 12px;
+    max-width: none;
   }
 }
