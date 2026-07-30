@@ -57,7 +57,6 @@ export default function OrgLaunchPanel({ team, completeTask }) {
         people={team.orgRoster}
         cutFields={team.orgCutFields}
         hiddenCuts={team.orgHiddenCuts}
-        cutValues={team.orgCutValues}
         hiddenValues={team.orgHiddenValues}
         launched={launched}
       />

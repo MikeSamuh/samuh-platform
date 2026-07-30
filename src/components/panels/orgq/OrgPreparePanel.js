@@ -43,15 +43,13 @@ export default function OrgPreparePanel({ team, completeTask }) {
           people={team.orgRoster}
           cutFields={team.orgCutFields}
           hiddenCuts={team.orgHiddenCuts}
-          cutValues={team.orgCutValues}
           hiddenValues={team.orgHiddenValues}
           onAddField={team.addOrgCutField}
           onRemoveField={team.removeOrgCutField}
           onHideCut={team.hideOrgCut}
           onRestoreCut={team.restoreOrgCut}
-          onAddValue={team.addOrgCutValue}
+          onAddValue={team.restoreOrgCutValue}
           onRemoveValue={team.removeOrgCutValue}
-          onRestoreValue={team.restoreOrgCutValue}
         />
       </div>
 

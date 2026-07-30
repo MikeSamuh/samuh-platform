@@ -6,7 +6,7 @@ import {
   allCutFields,
   cutsFor,
   hiddenBuiltIns,
-  hiddenCutValues,
+  restorableCutValues,
 } from "@/lib/orgq/roster";
 import styles from "./Orgq.module.css";
 
@@ -17,16 +17,15 @@ const SUGGESTIONS = ["Region", "Division", "Function", "Location", "Level"];
 // A *cut* is a dimension — Team, Manager, Region. Adding one adds a roster
 // column; removing one takes that column and its axis with it.
 //
-// A *group* is one value inside a cut — Engineering, EMEA. Groups normally come
-// straight from the roster, but they can also be declared up front so the org
-// structure can exist before the roster catches up, and removed individually so
-// a typo or a group you don't report on stops polluting the charts. Neither
-// action ever edits roster data.
+// A *group* is one value inside a cut — Engineering, EMEA. Groups come only
+// from the roster: a group exists because somebody is in it. They can be
+// removed from reporting, so a typo or a group you don't report on stops
+// polluting the charts, and added back — but never invented, which is why the
+// add control is a picker over real values rather than a text box.
 export default function OrgCuts({
   people,
   cutFields = [],
   hiddenCuts = [],
-  cutValues = [],
   hiddenValues = [],
   onAddField,
   onRemoveField,
@@ -34,16 +33,15 @@ export default function OrgCuts({
   onRestoreCut,
   onAddValue,
   onRemoveValue,
-  onRestoreValue,
 }) {
   const [draft, setDraft] = useState("");
-  // Which cut's "add a group" box is open, and what's typed in it.
+  // Which value is selected in each cut's add picker.
   const [valueDraft, setValueDraft] = useState({});
 
   const groups = allCutFields(cutFields, hiddenCuts).map((f) => ({
     ...f,
-    cuts: cutsFor(people, f.key, cutValues, hiddenValues),
-    removed: hiddenCutValues(f.key, hiddenValues),
+    cuts: cutsFor(people, f.key, hiddenValues),
+    removed: restorableCutValues(people, f.key, hiddenValues),
   }));
 
   const hiddenFields = hiddenBuiltIns(hiddenCuts);
@@ -62,7 +60,7 @@ export default function OrgCuts({
   }
 
   async function addValue(field) {
-    const value = (valueDraft[field] || "").trim();
+    const value = valueDraft[field];
     if (!value) return;
     await onAddValue(field, value);
     setValueDraft((d) => ({ ...d, [field]: "" }));
@@ -123,50 +121,42 @@ export default function OrgCuts({
             ))}
             {g.cuts.length === 0 && (
               <span className={styles.sub}>
-                Nothing yet — add a group below, or fill in the {g.label} column on
-                the roster.
+                Nothing yet — fill in the {g.label} column on the roster and the
+                groups will appear here.
               </span>
             )}
           </div>
 
+          {/* Only groups the roster actually contains can be added, so this is
+              a picker over removed values rather than a free-text field. */}
           {g.removed.length > 0 && (
-            <div className={styles.removedRow}>
-              <span className={styles.removedLabel}>Removed</span>
-              {g.removed.map((v) => (
-                <button
-                  key={v}
-                  type="button"
-                  className={styles.chip}
-                  onClick={() => onRestoreValue(g.key, v)}
-                  title={`Put ${v} back`}
-                >
-                  <Undo2 size={12} />
-                  {v}
-                </button>
-              ))}
+            <div className={styles.valueAddRow}>
+              <select
+                className={styles.select}
+                value={valueDraft[g.key] || ""}
+                onChange={(e) =>
+                  setValueDraft((d) => ({ ...d, [g.key]: e.target.value }))
+                }
+                aria-label={`Add a group back to ${g.label}`}
+              >
+                <option value="">Add back a removed {g.label.toLowerCase()}…</option>
+                {g.removed.map((v) => (
+                  <option key={v} value={v}>
+                    {v}
+                  </option>
+                ))}
+              </select>
+              <button
+                type="button"
+                className={styles.button}
+                onClick={() => addValue(g.key)}
+                disabled={!valueDraft[g.key]}
+              >
+                <Undo2 size={12} />
+                Add
+              </button>
             </div>
           )}
-
-          <div className={styles.valueAddRow}>
-            <input
-              className={styles.input}
-              placeholder={`Add a ${g.label.toLowerCase()}…`}
-              value={valueDraft[g.key] || ""}
-              onChange={(e) =>
-                setValueDraft((d) => ({ ...d, [g.key]: e.target.value }))
-              }
-              onKeyDown={(e) => e.key === "Enter" && addValue(g.key)}
-              aria-label={`Add a group to ${g.label}`}
-            />
-            <button
-              type="button"
-              className={styles.button}
-              onClick={() => addValue(g.key)}
-              disabled={!(valueDraft[g.key] || "").trim()}
-            >
-              Add
-            </button>
-          </div>
         </div>
       ))}
 

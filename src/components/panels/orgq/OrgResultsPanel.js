@@ -18,14 +18,13 @@ export default function OrgResultsPanel({ team, completeTask }) {
   const cutOpts = {
     fields: team.orgCutFields,
     hiddenFields: team.orgHiddenCuts,
-    declared: team.orgCutValues,
     hiddenValues: team.orgHiddenValues,
   };
 
   const fields = useMemo(
     () => populatedCutFields(team.orgRoster, cutOpts),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [team.orgRoster, team.orgCutFields, team.orgHiddenCuts, team.orgCutValues, team.orgHiddenValues]
+    [team.orgRoster, team.orgCutFields, team.orgHiddenCuts, team.orgHiddenValues]
   );
 
   // A chosen cut can stop being valid when the roster changes under it.
@@ -37,7 +36,6 @@ export default function OrgResultsPanel({ team, completeTask }) {
   const cuts = cutsFor(
     team.orgRoster,
     active.key,
-    team.orgCutValues,
     team.orgHiddenValues
   );
 

@@ -325,29 +325,11 @@ export function useTeamData(teamId, userId) {
       await actions.uncompleteTask("orgq-hidden-cuts", key);
     },
 
-    // Individual groups within a cut. Declaring one lets an org set out its
-    // structure before the roster catches up — a region can exist with nobody
-    // in it yet.
-    async addOrgCutValue(field, value) {
-      const trimmed = value.trim();
-      if (!field || !trimmed) return;
-      const key = valueKey(field, trimmed);
-      // Re-adding something previously removed just un-removes it.
-      await actions.uncompleteTask("orgq-hidden-values", key);
-      if ((data.taskChecks["orgq-cut-values"] || []).includes(key)) return;
-      await actions.completeTask("orgq-cut-values", key);
-    },
-
-    // Removing a group never edits the roster. If it only existed because it
-    // was declared, drop the declaration; if people carry the value, record it
-    // as removed so it stops showing up in the cuts and the charts.
+    // Individual groups within a cut. A group can only ever come from the
+    // roster, so there's nothing to create here — removing takes one out of
+    // reporting, adding puts a real one back. Neither touches roster data.
     async removeOrgCutValue(field, value) {
-      const key = valueKey(field, value);
-      await actions.uncompleteTask("orgq-cut-values", key);
-      const stillInRoster = (data.taskChecks["orgq-roster"] || [])
-        .map(decodePerson)
-        .some((p) => valueFor(p, field) === value);
-      if (stillInRoster) await actions.completeTask("orgq-hidden-values", key);
+      await actions.completeTask("orgq-hidden-values", valueKey(field, value));
     },
 
     async restoreOrgCutValue(field, value) {
@@ -475,12 +457,16 @@ export function useTeamData(teamId, userId) {
         if (current.includes(taskId)) return d;
         return { ...d, taskChecks: { ...d.taskChecks, [stepId]: [...current, taskId] } };
       });
-      await supabase
+      // Checked, because the optimistic update above makes a rejected write
+      // look like it worked until the next reload — the state on screen and the
+      // state in the database silently diverge.
+      const res = await supabase
         .from("step_progress")
         .upsert(
           { team_id: teamId, step_id: stepId, task_id: taskId },
           { onConflict: "team_id,step_id,task_id" }
         );
+      check(res, "save that");
     },
 
     async uncompleteTask(stepId, taskId) {
@@ -491,12 +477,13 @@ export function useTeamData(teamId, userId) {
           [stepId]: (d.taskChecks[stepId] || []).filter((id) => id !== taskId),
         },
       }));
-      await supabase
+      const res = await supabase
         .from("step_progress")
         .delete()
         .eq("team_id", teamId)
         .eq("step_id", stepId)
         .eq("task_id", taskId);
+      check(res, "undo that");
     },
   };
 
@@ -524,7 +511,6 @@ export function useTeamData(teamId, userId) {
     orgStewards: data.taskChecks["orgq-stewards"] || [],
     orgCutFields: data.taskChecks["orgq-cut-fields"] || [],
     orgHiddenCuts: data.taskChecks["orgq-hidden-cuts"] || [],
-    orgCutValues: data.taskChecks["orgq-cut-values"] || [],
     orgHiddenValues: data.taskChecks["orgq-hidden-values"] || [],
     orgName: (data.taskChecks["orgq-org-name"] || [])[0] || null,
     packageSize: (data.taskChecks["orgq-package"] || [])[0] || null,

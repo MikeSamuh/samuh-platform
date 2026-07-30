@@ -13,14 +13,12 @@ export default function CompletionByCut({
   people,
   cutFields = [],
   hiddenCuts = [],
-  cutValues = [],
   hiddenValues = [],
   launched,
 }) {
   const { field, cuts } = primaryCuts(people, {
     fields: cutFields,
     hiddenFields: hiddenCuts,
-    declared: cutValues,
     hiddenValues,
   });
 

@@ -114,14 +114,11 @@ function keysFor(entries, field) {
   return out;
 }
 
-// The groups within a cut. Values come from the roster, plus any the org has
-// declared up front (so a region can exist before anyone is assigned to it),
-// minus any it has removed. Declared-but-empty groups are kept — an org
-// structure is real whether or not the roster has caught up.
-export function cutsFor(people, key, declared = [], hidden = []) {
+// The groups within a cut are exactly the distinct values the roster holds for
+// that field, minus any the org has removed. Nothing can be invented here — a
+// group only exists because somebody on the roster is in it.
+export function cutsFor(people, key, hidden = []) {
   const counts = new Map();
-  for (const value of keysFor(declared, key)) counts.set(value, 0);
-
   for (const person of people) {
     const value = valueFor(person, key);
     if (!value) continue;
@@ -135,9 +132,16 @@ export function cutsFor(people, key, declared = [], hidden = []) {
     .sort((a, b) => b.count - a.count || a.value.localeCompare(b.value));
 }
 
-// Removed values, so they can be offered back.
-export function hiddenCutValues(key, hidden = []) {
-  return [...keysFor(hidden, key)].sort();
+// Groups that exist in the roster but have been removed from reporting — the
+// only things that can be added back, and the only thing "add" can offer.
+export function restorableCutValues(people, key, hidden = []) {
+  const removed = keysFor(hidden, key);
+  const inRoster = new Set();
+  for (const person of people) {
+    const value = valueFor(person, key);
+    if (value && removed.has(value)) inRoster.add(value);
+  }
+  return [...inRoster].sort();
 }
 
 // Which cut the org-level visuals hang off. Honour an explicit choice when it
@@ -147,12 +151,12 @@ export function hiddenCutValues(key, hidden = []) {
 // arguments, since they all need the same four lists.
 export function primaryCuts(
   people,
-  { fields = [], hiddenFields = [], declared = [], hiddenValues = [], preferred = null } = {}
+  { fields = [], hiddenFields = [], hiddenValues = [], preferred = null } = {}
 ) {
   const available = allCutFields(fields, hiddenFields);
 
   if (preferred) {
-    const cuts = cutsFor(people, preferred, declared, hiddenValues);
+    const cuts = cutsFor(people, preferred, hiddenValues);
     if (cuts.length > 0) {
       const field = available.find((f) => f.key === preferred);
       return { field: field?.label || preferred, key: preferred, cuts };
@@ -160,7 +164,7 @@ export function primaryCuts(
   }
 
   for (const field of available) {
-    const cuts = cutsFor(people, field.key, declared, hiddenValues);
+    const cuts = cutsFor(people, field.key, hiddenValues);
     if (cuts.length > 0) return { field: field.label, key: field.key, cuts };
   }
 
@@ -171,9 +175,9 @@ export function primaryCuts(
 // offering as an axis.
 export function populatedCutFields(
   people,
-  { fields = [], hiddenFields = [], declared = [], hiddenValues = [] } = {}
+  { fields = [], hiddenFields = [], hiddenValues = [] } = {}
 ) {
   return allCutFields(fields, hiddenFields).filter(
-    (f) => cutsFor(people, f.key, declared, hiddenValues).length > 0
+    (f) => cutsFor(people, f.key, hiddenValues).length > 0
   );
 }
