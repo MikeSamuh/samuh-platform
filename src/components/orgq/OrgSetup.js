@@ -4,16 +4,17 @@ import { useEffect, useState } from "react";
 import { Building2 } from "lucide-react";
 import styles from "./Orgq.module.css";
 
-// Package tiers are display-only. No payment is taken anywhere in the app —
-// Samuh invoices separately — so this records the intended size, nothing more.
-function tierFor(size) {
-  const n = Number(size);
-  if (!n) return null;
-  if (n <= 50) return "Starter · up to 50 people";
-  if (n <= 250) return "Growth · up to 250 people";
-  if (n <= 1000) return "Scale · up to 1,000 people";
-  return "Enterprise · 1,000+ people";
-}
+// Bands rather than an exact headcount — an org sizing an engagement knows
+// roughly how many people it covers, not the precise number. The stored value
+// is the label itself, so it stays readable wherever it surfaces.
+const PACKAGE_SIZES = [
+  "<100",
+  "100-500",
+  "500-1000",
+  "1000-3000",
+  "3000-5000",
+  "5000-10000",
+];
 
 // Org name and package size are single stored values, kept together because
 // they're the two facts that define the engagement.
@@ -37,14 +38,14 @@ export default function OrgSetup({ orgName, packageSize, onSaveName, onSaveSize 
     flash("name");
   }
 
-  async function saveSize() {
-    const n = Number(size);
-    if (!n || n < 1 || String(n) === packageSize) return;
-    await onSaveSize(String(n));
+  // The dropdown commits straight away — there's nothing to type, so a Save
+  // button would just be an extra click.
+  async function selectSize(value) {
+    setSize(value);
+    if (!value || value === packageSize) return;
+    await onSaveSize(value);
     flash("size");
   }
-
-  const tier = tierFor(size);
 
   return (
     <div className={styles.card}>
@@ -86,27 +87,21 @@ export default function OrgSetup({ orgName, packageSize, onSaveName, onSaveSize 
       <div className={styles.cutGroup}>
         <div className={styles.cutLabel}>Package size</div>
         <div className={styles.fieldRow}>
-          <input
-            className={styles.input}
-            type="number"
-            min="1"
-            placeholder="Number of people"
+          <select
+            className={styles.select}
             value={size}
-            onChange={(e) => setSize(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && saveSize()}
-            aria-label="Package size in people"
-          />
-          <button
-            type="button"
-            className={styles.button}
-            onClick={saveSize}
-            disabled={!Number(size) || String(Number(size)) === packageSize}
+            onChange={(e) => selectSize(e.target.value)}
+            aria-label="Package size"
           >
-            Save
-          </button>
+            <option value="">How many people does OrgQ cover?</option>
+            {PACKAGE_SIZES.map((s) => (
+              <option key={s} value={s}>
+                {s} people
+              </option>
+            ))}
+          </select>
           {savedField === "size" && <span className={styles.saved}>Saved</span>}
         </div>
-        {tier && <div className={styles.hint}>{tier}</div>}
       </div>
 
       <div className={styles.hint}>

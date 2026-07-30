@@ -1,15 +1,16 @@
 "use client";
 
 import { LayoutGrid } from "lucide-react";
-import { primaryCuts } from "@/lib/orgq/roster";
+import { cutsFor } from "@/lib/orgq/roster";
 import { cutScore, seededScore } from "@/lib/orgq/sampleData";
 import shared from "./Orgq.module.css";
 import styles from "./ValueMatrix.module.css";
 
 // Need against value, so you can sequence which groups get a team journey
 // first. Top-right is where the work pays back fastest.
-export default function ValueMatrix({ people }) {
-  const { field, cuts } = primaryCuts(people);
+export default function ValueMatrix({ people, cutKey, cutLabel }) {
+  const cuts = cutsFor(people, cutKey);
+  const field = cutLabel.toLowerCase();
 
   // `cut.value` is the cut's name; the two axes get their own names so they
   // can't shadow it.
@@ -54,7 +55,7 @@ export default function ValueMatrix({ people }) {
 
       {plotted.length === 0 ? (
         <div className={shared.empty}>
-          Add people to the roster with a team or manager to plot your groups.
+          Fill in the {cutLabel} column on the roster to plot your groups.
         </div>
       ) : (
         <div className={styles.wrap}>

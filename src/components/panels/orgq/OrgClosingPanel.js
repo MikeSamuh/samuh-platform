@@ -38,9 +38,11 @@ export default function OrgClosingPanel({ team, completeTask }) {
         icon={Rocket}
         title="Launch the next TeamQ"
         sub="Starts the team journey cycle again for the teams you prioritised"
-        missingLinkSub="Launch TeamQ from each team's own Launch step"
+        missingLinkSub="TeamQ launches from each team's own Launch step — mark this once the teams you prioritised have started"
         buttonLabel="Launch TeamQ"
+        actionLabel="Mark as launched"
         href={null}
+        done={(team.taskChecks["orgq-closing"] || []).includes("launch-teamq")}
         onOpen={() => completeTask("orgq-closing", "launch-teamq")}
       />
     </div>

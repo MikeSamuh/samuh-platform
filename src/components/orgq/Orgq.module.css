@@ -172,11 +172,25 @@
 }
 
 .cutLabel {
+  display: flex;
+  align-items: center;
+  gap: 7px;
   font-size: var(--fs-eyebrow);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--text-faint);
   margin-bottom: 7px;
+}
+
+/* Suggestion chips are buttons, so they need the affordance. */
+button.chip {
+  cursor: pointer;
+  color: var(--text-dim);
+}
+
+button.chip:hover {
+  color: var(--text);
+  border-color: var(--accent);
 }
 
 .guidance {

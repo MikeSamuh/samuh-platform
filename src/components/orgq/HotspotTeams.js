@@ -1,7 +1,7 @@
 "use client";
 
 import { Flame } from "lucide-react";
-import { primaryCuts } from "@/lib/orgq/roster";
+import { cutsFor } from "@/lib/orgq/roster";
 import { bandFor, cutScore, needsFor } from "@/lib/orgq/sampleData";
 import shared from "./Orgq.module.css";
 
@@ -9,8 +9,9 @@ const TOP_N = 6;
 
 // The groups the heat map surfaces first, ranked worst-scoring, with what each
 // one most needs. These are the teams to start a journey with.
-export default function HotspotTeams({ people }) {
-  const { field, cuts } = primaryCuts(people);
+export default function HotspotTeams({ people, cutKey, cutLabel }) {
+  const cuts = cutsFor(people, cutKey);
+  const field = cutLabel.toLowerCase();
 
   const ranked = cuts
     .map((cut) => ({ name: cut.value, count: cut.count, score: cutScore(cut.value) }))
@@ -25,7 +26,7 @@ export default function HotspotTeams({ people }) {
         </span>
         <div className={`${shared.headText} ${shared.headRow}`} style={{ flex: 1 }}>
           <div>
-            <div className={shared.title}>Hotspot teams</div>
+            <div className={shared.title}>Hotspots</div>
             <div className={shared.sub}>
               The {field}s with the highest need, and what each one is asking for
             </div>
@@ -36,7 +37,7 @@ export default function HotspotTeams({ people }) {
 
       {shown.length === 0 ? (
         <div className={shared.empty}>
-          Add people to the roster with a team or manager to surface hotspots.
+          Fill in the {cutLabel} column on the roster to surface hotspots.
         </div>
       ) : (
         <>

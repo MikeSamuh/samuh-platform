@@ -53,7 +53,11 @@ export default function OrgLaunchPanel({ team, completeTask }) {
         )}
       </div>
 
-      <CompletionByCut people={team.orgRoster} launched={launched} />
+      <CompletionByCut
+        people={team.orgRoster}
+        cutFields={team.orgCutFields}
+        launched={launched}
+      />
     </div>
   );
 }

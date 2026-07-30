@@ -31,22 +31,30 @@ export default function OrgPreparePanel({ team, completeTask }) {
       <div data-tour="roster">
         <OrgRoster
           people={team.orgRoster}
+          cutFields={team.orgCutFields}
           onAddMany={team.addOrgPeople}
           onRemove={team.removeOrgPerson}
         />
       </div>
 
       <div data-tour="cuts">
-        <OrgCuts people={team.orgRoster} />
+        <OrgCuts
+          people={team.orgRoster}
+          cutFields={team.orgCutFields}
+          onAddField={team.addOrgCutField}
+          onRemoveField={team.removeOrgCutField}
+        />
       </div>
 
       <CoachingCard
         icon={Mail}
         title="Send the welcome and invite links"
         sub="Everyone on the roster gets an invite email — they sign in with the address you listed"
-        missingLinkSub="Invite sending isn't connected yet — no email provider is configured"
+        missingLinkSub="No email provider is connected yet — send the invites from your own mail client for now"
         buttonLabel="Send invites"
+        actionLabel="Mark invites as sent"
         href={null}
+        done={(team.taskChecks["orgq-prepare"] || []).includes("invites")}
         onOpen={() => completeTask("orgq-prepare", "invites")}
       />
     </div>

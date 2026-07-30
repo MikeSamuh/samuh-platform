@@ -4,12 +4,13 @@ import { Activity } from "lucide-react";
 import BarChart from "@/components/awareness/BarChart";
 import { primaryCuts } from "@/lib/orgq/roster";
 import { seededScore } from "@/lib/orgq/sampleData";
+// Launch has no axis picker — it just reads by whichever cut is populated.
 import shared from "./Orgq.module.css";
 
 // Response rates while the survey is open, so you can see which parts of the
 // org need chasing. Rows are real cuts; the rates are stand-ins.
-export default function CompletionByCut({ people, launched }) {
-  const { field, cuts } = primaryCuts(people);
+export default function CompletionByCut({ people, cutFields = [], launched }) {
+  const { field, cuts } = primaryCuts(people, cutFields);
 
   const rows = cuts.map((cut) => ({
     label: cut.value,
@@ -41,7 +42,7 @@ export default function CompletionByCut({ people, launched }) {
 
       {rows.length === 0 ? (
         <div className={shared.empty}>
-          Add people to the roster with a team or manager to track completion by cut.
+          Fill in a cut column on the roster to track completion by group.
         </div>
       ) : !launched ? (
         <div className={shared.empty}>

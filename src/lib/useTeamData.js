@@ -298,6 +298,21 @@ export function useTeamData(teamId, userId) {
       }
     },
 
+    // Cut fields the org defines for itself — Region, Division, whatever
+    // matches how they're actually structured. Stored by label.
+    async addOrgCutField(label) {
+      const trimmed = label.trim();
+      const current = data.taskChecks["orgq-cut-fields"] || [];
+      if (!trimmed || current.includes(trimmed)) return;
+      // Would collide with a built-in cut and be unreachable.
+      if (["team", "manager", "tenure"].includes(trimmed.toLowerCase())) return;
+      await actions.completeTask("orgq-cut-fields", trimmed);
+    },
+
+    async removeOrgCutField(label) {
+      await actions.uncompleteTask("orgq-cut-fields", label);
+    },
+
     async setOrgName(name) {
       await setSingleValue("orgq-org-name", name.trim());
       if (name.trim()) await actions.completeTask("orgq-prepare", "org-name");
@@ -466,6 +481,7 @@ export function useTeamData(teamId, userId) {
     feedbackCadence: (data.taskChecks["feedback-emails"] || [])[0] || "off",
     orgRoster: (data.taskChecks["orgq-roster"] || []).map(decodePerson),
     orgStewards: data.taskChecks["orgq-stewards"] || [],
+    orgCutFields: data.taskChecks["orgq-cut-fields"] || [],
     orgName: (data.taskChecks["orgq-org-name"] || [])[0] || null,
     packageSize: (data.taskChecks["orgq-package"] || [])[0] || null,
     orgLaunched: (data.taskChecks["orgq-launch"] || []).includes("launch-survey"),

@@ -47,10 +47,12 @@
   overflow-y: auto;
 }
 
-/* Name · Email · Team · Manager · Tenure · remove */
+/* Columns are dynamic — the org adds its own cut fields — so the track list
+   comes in as --cols. Set via a custom property rather than an inline
+   grid-template-columns, which would outrank the mobile media queries below. */
 .row {
   display: grid;
-  grid-template-columns: 1.1fr 1.5fr 1fr 1fr 0.8fr 28px;
+  grid-template-columns: var(--cols, 1.1fr 1.5fr 1fr 1fr 0.8fr 28px);
   gap: 8px;
   align-items: center;
   padding: 7px 4px;
@@ -110,7 +112,7 @@
 
 .addRow {
   display: grid;
-  grid-template-columns: 1.1fr 1.5fr 1fr 1fr 0.8fr auto;
+  grid-template-columns: var(--cols, 1.1fr 1.5fr 1fr 1fr 0.8fr auto);
   gap: 8px;
 }
 

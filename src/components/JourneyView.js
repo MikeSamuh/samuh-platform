@@ -6,6 +6,7 @@ import StepChecklist from "@/components/StepChecklist";
 import TourCard from "@/components/TourCard";
 import GuidedTour from "@/components/GuidedTour";
 import { isStepComplete, unlockedIndexFor, visibleStepsFor } from "@/lib/journeys/progress";
+import { burstConfetti } from "@/lib/confetti";
 import styles from "./JourneyView.module.css";
 
 // One journey, rendered from its descriptor: the step path, the walkthrough
@@ -32,21 +33,33 @@ export default function JourneyView({
   // change, so restoring a finished step on refresh doesn't bounce the user
   // forward. The ref resets when the journey unmounts, which makes a tab switch
   // back a first pass rather than a jump.
+  // Only this journey's own step rows count. taskChecks also carries reserved
+  // non-step keys (the org roster, cut fields, ritual keepers, canvases), and
+  // watching the whole blob meant adding a roster row read as "a task changed"
+  // — advancing the step and firing the confetti for nothing.
+  const stepSignature = JSON.stringify(
+    journey.steps.map((s) => team.taskChecks[s.id] || [])
+  );
+
   const seenChecks = useRef(null);
   useEffect(() => {
     if (team.loading) return;
-    const signature = JSON.stringify(team.taskChecks);
+    const signature = stepSignature;
     const firstPass = seenChecks.current === null;
     const unchanged = seenChecks.current === signature;
     seenChecks.current = signature;
     if (firstPass || unchanged) return;
     if (!isStepComplete(journey, activeStepId, team.taskChecks)) return;
+
+    // Finishing a step is the whole point of the step — mark it.
+    burstConfetti();
+
     const index = visibleSteps.findIndex((s) => s.id === activeStepId);
     if (index !== -1 && index < visibleSteps.length - 1) {
       onSelectStep(visibleSteps[index + 1].id);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [team.taskChecks, team.loading]);
+  }, [stepSignature, team.loading]);
 
   // Leaving a step mid-walkthrough shouldn't leave the overlay up.
   useEffect(() => {

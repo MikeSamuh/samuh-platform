@@ -1,15 +1,26 @@
 "use client";
 
 import { Grid3x3 } from "lucide-react";
-import { primaryCuts } from "@/lib/orgq/roster";
+import { cutsFor } from "@/lib/orgq/roster";
 import { bandFor, bandLegend, orgDimensions, seededScore } from "@/lib/orgq/sampleData";
 import shared from "./Orgq.module.css";
 import styles from "./RiskHeatMap.module.css";
 
-// Every org cut against every dimension. Rows come from the real roster; the
-// scores are seeded stand-ins until assessment data exists.
-export default function RiskHeatMap({ people }) {
-  const { field, cuts } = primaryCuts(people);
+const MIN_DOT = 7;
+const MAX_DOT = 26;
+// Below this a cell is doing badly enough to call out.
+const FLAG_BELOW = 52;
+
+// Dot size carries the level of need, so the biggest marks are the biggest
+// problems; colour carries the band, so the two reinforce each other. Rows are
+// whichever cut of the org you're reading by.
+function dotSize(score) {
+  const need = (100 - score) / 100;
+  return Math.round(MIN_DOT + need * (MAX_DOT - MIN_DOT));
+}
+
+export default function RiskHeatMap({ people, cutKey, cutLabel }) {
+  const cuts = cutsFor(people, cutKey);
 
   return (
     <div className={shared.card} data-tour="heatmap">
@@ -21,8 +32,8 @@ export default function RiskHeatMap({ people }) {
           <div>
             <div className={shared.title}>High-risk heat map</div>
             <div className={shared.sub}>
-              Each {field} against every dimension — warm cells are where the need is
-              highest
+              Each {cutLabel.toLowerCase()} against every dimension — bigger, warmer
+              dots are where the need is highest
             </div>
           </div>
           <span className={shared.sampleTag}>Sample data</span>
@@ -31,7 +42,7 @@ export default function RiskHeatMap({ people }) {
 
       {cuts.length === 0 ? (
         <div className={shared.empty}>
-          Add people to the roster with a team or manager and the heat map will fill in.
+          Fill in the {cutLabel} column on the roster and the heat map will fill in.
         </div>
       ) : (
         <>
@@ -39,10 +50,10 @@ export default function RiskHeatMap({ people }) {
             <div
               className={styles.grid}
               style={{
-                gridTemplateColumns: `minmax(120px, max-content) repeat(${orgDimensions.length}, 92px)`,
+                gridTemplateColumns: `minmax(110px, max-content) repeat(${orgDimensions.length}, 88px)`,
               }}
             >
-              <div className={`${styles.colHead} ${styles.corner}`} />
+              <div className={styles.corner} />
               {orgDimensions.map((d) => (
                 <div key={d} className={styles.colHead}>
                   {d}
@@ -50,12 +61,23 @@ export default function RiskHeatMap({ people }) {
               ))}
 
               {cuts.map((cut) => (
-                <Row key={cut.value} cut={cut} />
+                <Row key={cut.value} name={cut.value} />
               ))}
             </div>
           </div>
 
           <div className={styles.legend}>
+            <span className={styles.legendItem}>
+              <span
+                className={styles.legendDot}
+                style={{ width: MIN_DOT, height: MIN_DOT }}
+              />
+              <span
+                className={styles.legendDot}
+                style={{ width: MAX_DOT, height: MAX_DOT }}
+              />
+              <span className={styles.legendNote}>smaller = doing well, larger = higher need</span>
+            </span>
             {bandLegend.map((b) => (
               <span key={b.label} className={styles.legendItem}>
                 <span
@@ -72,23 +94,28 @@ export default function RiskHeatMap({ people }) {
   );
 }
 
-function Row({ cut }) {
+function Row({ name }) {
   return (
     <>
-      <div className={styles.rowHead} title={cut.value}>
-        {cut.value}
+      <div className={styles.rowHead} title={name}>
+        {name}
       </div>
-      {orgDimensions.map((d) => {
-        const score = seededScore(`${cut.value}|${d}`);
+      {orgDimensions.map((d, i) => {
+        const score = seededScore(`${name}|${d}`);
         const band = bandFor(score);
+        const size = dotSize(score);
         return (
-          <div
-            key={d}
-            className={styles.cell}
-            style={{ background: `var(${band.varName})` }}
-            title={`${cut.value} · ${d}: ${score} (${band.label})`}
-          >
-            {score}
+          <div key={d} className={styles.cell} data-first={i === 0}>
+            <span
+              className={styles.dot}
+              data-flagged={score < FLAG_BELOW}
+              style={{
+                width: size,
+                height: size,
+                background: `var(${band.varName})`,
+              }}
+              title={`${name} · ${d}: ${score} (${band.label})`}
+            />
           </div>
         );
       })}

@@ -2,59 +2,90 @@
 
 import { useRef, useState } from "react";
 import { X, Upload, Download } from "lucide-react";
+import { BUILT_IN_CUTS, valueFor } from "@/lib/orgq/roster";
 import styles from "./OrgRoster.module.css";
 
-const COLUMNS = ["Name", "Email", "Team", "Manager", "Tenure"];
+// Deliberately simple: split on commas, match the header to the columns on
+// screen. Quoted fields containing commas aren't supported — the template
+// doesn't produce them, and anything more needs a real CSV parser.
+function parseCsv(text, columns) {
+  const lines = text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  if (lines.length === 0) return [];
 
-const CSV_TEMPLATE =
-  "Name,Email,Team,Manager,Tenure\n" +
-  "Jane Doe,jane@example.com,Commercial Ops,Priya Shah,2 years\n";
+  const headerCells = lines[0].split(",").map((c) => c.trim().toLowerCase());
+  const looksLikeHeader = headerCells[0] === "name";
 
-// Deliberately simple: split on commas, skip a header row. Quoted fields
-// containing commas aren't supported — the template doesn't produce them, and
-// anything more needs a real CSV parser.
-function parseCsv(text) {
+  // Map each column to its position in the file, falling back to the on-screen
+  // order when the file has no header.
+  const indexOf = {};
+  columns.forEach((col, i) => {
+    const found = looksLikeHeader
+      ? headerCells.indexOf(col.label.toLowerCase())
+      : i;
+    indexOf[col.key] = found === -1 ? null : found;
+  });
+
   const rows = [];
-  for (const line of text.split(/\r?\n/)) {
-    const trimmed = line.trim();
-    if (!trimmed) continue;
-    const [name, email = "", team = "", manager = "", tenure = ""] = trimmed
-      .split(",")
-      .map((c) => c.trim());
+  for (const line of lines.slice(looksLikeHeader ? 1 : 0)) {
+    const cells = line.split(",").map((c) => c.trim());
+    const name = cells[indexOf.name ?? 0] || "";
     if (!name || name.toLowerCase() === "name") continue;
-    rows.push({ name, email, team, manager, tenure });
+
+    const row = { name, email: "", team: "", manager: "", tenure: "", extra: {} };
+    for (const col of columns) {
+      const at = indexOf[col.key];
+      const value = at === null || at === undefined ? "" : cells[at] || "";
+      if (col.key === "name") continue;
+      if (col.custom) row.extra[col.key] = value;
+      else row[col.key] = value;
+    }
+    rows.push(row);
   }
   return rows;
 }
 
 // The org roster. Wider than the team roster — team and manager are what make
-// the org cuts possible — and it uploads in bulk, since an org roster is
-// hundreds of rows rather than a handful.
-export default function OrgRoster({ people, onAddMany, onRemove }) {
+// the org cuts possible — and it grows extra columns for whatever cuts the org
+// has defined for itself. Imports in bulk, since an org roster is hundreds of
+// rows rather than a handful.
+export default function OrgRoster({ people, cutFields = [], onAddMany, onRemove }) {
   const fileRef = useRef(null);
-  const [draft, setDraft] = useState({
-    name: "",
-    email: "",
-    team: "",
-    manager: "",
-    tenure: "",
-  });
   const [uploadNote, setUploadNote] = useState(null);
 
-  const set = (key) => (e) => setDraft((d) => ({ ...d, [key]: e.target.value }));
+  const columns = [
+    { key: "name", label: "Name" },
+    { key: "email", label: "Email" },
+    ...BUILT_IN_CUTS,
+    ...cutFields.map((label) => ({ key: label, label, custom: true })),
+  ];
+
+  const blankDraft = Object.fromEntries(columns.map((c) => [c.key, ""]));
+  const [draft, setDraft] = useState(blankDraft);
+
+  const gridTemplate = `${columns
+    .map((c) => (c.key === "email" ? "1.5fr" : "1.1fr"))
+    .join(" ")} 28px`;
+
+  function toRow(values) {
+    const row = { name: "", email: "", team: "", manager: "", tenure: "", extra: {} };
+    for (const col of columns) {
+      if (col.custom) row.extra[col.key] = values[col.key] || "";
+      else row[col.key] = values[col.key] || "";
+    }
+    return row;
+  }
 
   async function handleAdd() {
-    if (!draft.name.trim()) return;
-    await onAddMany([draft]);
-    setDraft({ name: "", email: "", team: "", manager: "", tenure: "" });
+    if (!draft.name?.trim()) return;
+    await onAddMany([toRow(draft)]);
+    setDraft(blankDraft);
   }
 
   async function handleUpload(e) {
     const file = e.target.files?.[0];
     e.target.value = "";
     if (!file) return;
-    const text = await file.text();
-    const rows = parseCsv(text);
+    const rows = parseCsv(await file.text(), columns);
     if (rows.length === 0) {
       setUploadNote("No rows found — check the file has a Name column.");
       return;
@@ -68,7 +99,19 @@ export default function OrgRoster({ people, onAddMany, onRemove }) {
   }
 
   function handleTemplate() {
-    const blob = new Blob([CSV_TEMPLATE], { type: "text/csv" });
+    const header = columns.map((c) => c.label).join(",");
+    const example = columns
+      .map((c) =>
+        ({
+          name: "Jane Doe",
+          email: "jane@example.com",
+          team: "Commercial Ops",
+          manager: "Priya Shah",
+          tenure: "2 years",
+        })[c.key] || ""
+      )
+      .join(",");
+    const blob = new Blob([`${header}\n${example}\n`], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -105,9 +148,12 @@ export default function OrgRoster({ people, onAddMany, onRemove }) {
       </div>
 
       <div className={styles.rows}>
-        <div className={`${styles.row} ${styles.headerRow}`}>
-          {COLUMNS.map((c) => (
-            <span key={c}>{c}</span>
+        <div
+          className={`${styles.row} ${styles.headerRow}`}
+          style={{ "--cols": gridTemplate }}
+        >
+          {columns.map((c) => (
+            <span key={c.key}>{c.label}</span>
           ))}
           <span />
         </div>
@@ -117,12 +163,20 @@ export default function OrgRoster({ people, onAddMany, onRemove }) {
           </div>
         )}
         {people.map((p) => (
-          <div key={p.raw} className={styles.row}>
-            <span className={styles.name}>{p.name}</span>
-            <span className={styles.cell}>{p.email || "—"}</span>
-            <span className={styles.cell}>{p.team || "—"}</span>
-            <span className={styles.cell}>{p.manager || "—"}</span>
-            <span className={styles.cell}>{p.tenure || "—"}</span>
+          <div
+            key={p.raw}
+            className={styles.row}
+            style={{ "--cols": gridTemplate }}
+          >
+            {columns.map((c) => {
+              const value =
+                c.key === "name" ? p.name : c.key === "email" ? p.email : valueFor(p, c.key);
+              return (
+                <span key={c.key} className={c.key === "name" ? styles.name : styles.cell}>
+                  {value || "—"}
+                </span>
+              );
+            })}
             <button
               type="button"
               className={styles.remove}
@@ -135,24 +189,24 @@ export default function OrgRoster({ people, onAddMany, onRemove }) {
         ))}
       </div>
 
-      <div className={styles.addRow}>
-        {["name", "email", "team", "manager", "tenure"].map((key, i) => (
+      <div className={styles.addRow} style={{ "--cols": gridTemplate }}>
+        {columns.map((c) => (
           <input
-            key={key}
+            key={c.key}
             className={styles.input}
-            placeholder={COLUMNS[i]}
-            type={key === "email" ? "email" : "text"}
-            value={draft[key]}
-            onChange={set(key)}
+            placeholder={c.label}
+            type={c.key === "email" ? "email" : "text"}
+            value={draft[c.key] || ""}
+            onChange={(e) => setDraft((d) => ({ ...d, [c.key]: e.target.value }))}
             onKeyDown={(e) => e.key === "Enter" && handleAdd()}
-            aria-label={COLUMNS[i]}
+            aria-label={c.label}
           />
         ))}
         <button
           type="button"
           className={styles.addButton}
           onClick={handleAdd}
-          disabled={!draft.name.trim()}
+          disabled={!draft.name?.trim()}
         >
           Add
         </button>
@@ -161,9 +215,9 @@ export default function OrgRoster({ people, onAddMany, onRemove }) {
       {uploadNote && <div className={styles.note}>{uploadNote}</div>}
 
       <div className={styles.note}>
-        Team and manager are what make the org cuts work — results can be sliced by
-        either. Entries are add-and-remove only, so correcting one means removing it
-        and adding it again.
+        Every column except name and email becomes a cut you can slice results by.
+        Entries are add-and-remove only, so correcting one means removing it and
+        adding it again.
       </div>
     </div>
   );
