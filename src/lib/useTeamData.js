@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import { decodePerson, encodePerson } from "@/lib/orgq/roster";
 
 const EMPTY = {
   team: null,
@@ -105,6 +106,15 @@ export function useTeamData(teamId, userId) {
     return updated;
   }
 
+  // Several reserved step ids hold exactly one value. Clear whatever is there,
+  // then write the new one.
+  async function setSingleValue(stepId, value) {
+    for (const existing of data.taskChecks[stepId] || []) {
+      await actions.uncompleteTask(stepId, existing);
+    }
+    if (value) await actions.completeTask(stepId, value);
+  }
+
   const actions = {
     async renameTeam(name) {
       const trimmed = name.trim();
@@ -189,12 +199,7 @@ export function useTeamData(teamId, userId) {
 
     // Optional display name for the default canvas (single stored value).
     async setDefaultCanvasName(name) {
-      const trimmed = name.trim();
-      const current = data.taskChecks["canvas-default-name"] || [];
-      for (const existing of current) {
-        await actions.uncompleteTask("canvas-default-name", existing);
-      }
-      if (trimmed) await actions.completeTask("canvas-default-name", trimmed);
+      await setSingleValue("canvas-default-name", name.trim());
     },
 
     // Removing a canvas also removes its notes (namespaced by name).
@@ -228,13 +233,79 @@ export function useTeamData(teamId, userId) {
     },
 
     async setFeedbackCadence(cadence) {
-      const current = data.taskChecks["feedback-emails"] || [];
-      for (const existing of current) {
-        await actions.uncompleteTask("feedback-emails", existing);
+      // "off" is stored as no row at all.
+      await setSingleValue("feedback-emails", cadence === "off" ? "" : cadence);
+    },
+
+    // --- OrgQ journey -------------------------------------------------------
+    // Same storage trick as the canvases: no schema change was available, so
+    // each of these lives in step_progress under a reserved step id with the
+    // value carried in task_id. See @/lib/orgq/roster for the encoding.
+
+    // Bulk, not one call per row: an org roster arrives as a CSV of hundreds of
+    // people, and a loop over completeTask would be one round-trip each.
+    // Returns how many were actually new.
+    async addOrgPeople(rows) {
+      const existing = new Set(data.taskChecks["orgq-roster"] || []);
+      const encoded = [];
+      for (const row of rows) {
+        if (!row.name?.trim()) continue;
+        const key = encodePerson(row);
+        if (existing.has(key)) continue;
+        existing.add(key);
+        encoded.push(key);
       }
-      if (cadence && cadence !== "off") {
-        await actions.completeTask("feedback-emails", cadence);
+      if (encoded.length === 0) return 0;
+
+      setData((d) => ({
+        ...d,
+        taskChecks: {
+          ...d.taskChecks,
+          "orgq-roster": [...(d.taskChecks["orgq-roster"] || []), ...encoded],
+        },
+      }));
+      const res = await supabase.from("step_progress").upsert(
+        encoded.map((task_id) => ({
+          team_id: teamId,
+          step_id: "orgq-roster",
+          task_id,
+        })),
+        { onConflict: "team_id,step_id,task_id" }
+      );
+      if (!check(res, "add those people")) return 0;
+      await actions.completeTask("orgq-prepare", "roster");
+      return encoded.length;
+    },
+
+    async removeOrgPerson(raw) {
+      await actions.uncompleteTask("orgq-roster", raw);
+      // Someone removed from the roster can't stay a steward.
+      if ((data.taskChecks["orgq-stewards"] || []).includes(raw)) {
+        await actions.uncompleteTask("orgq-stewards", raw);
       }
+    },
+
+    async addOrgSteward(raw) {
+      if (!raw || (data.taskChecks["orgq-stewards"] || []).includes(raw)) return;
+      await actions.completeTask("orgq-stewards", raw);
+      await actions.completeTask("orgq-launch", "stewards");
+    },
+
+    async removeOrgSteward(raw) {
+      await actions.uncompleteTask("orgq-stewards", raw);
+      if ((data.taskChecks["orgq-stewards"] || []).length <= 1) {
+        await actions.uncompleteTask("orgq-launch", "stewards");
+      }
+    },
+
+    async setOrgName(name) {
+      await setSingleValue("orgq-org-name", name.trim());
+      if (name.trim()) await actions.completeTask("orgq-prepare", "org-name");
+    },
+
+    async setPackageSize(size) {
+      await setSingleValue("orgq-package", String(size).trim());
+      if (size) await actions.completeTask("orgq-prepare", "package");
     },
 
     async setLaunched(value) {
@@ -393,6 +464,11 @@ export function useTeamData(teamId, userId) {
     canvasPractices: data.taskChecks["canvas-practices"] || [],
     defaultCanvasName: (data.taskChecks["canvas-default-name"] || [])[0] || null,
     feedbackCadence: (data.taskChecks["feedback-emails"] || [])[0] || "off",
+    orgRoster: (data.taskChecks["orgq-roster"] || []).map(decodePerson),
+    orgStewards: data.taskChecks["orgq-stewards"] || [],
+    orgName: (data.taskChecks["orgq-org-name"] || [])[0] || null,
+    packageSize: (data.taskChecks["orgq-package"] || [])[0] || null,
+    orgLaunched: (data.taskChecks["orgq-launch"] || []).includes("launch-survey"),
     reload: load,
     ...actions,
   };

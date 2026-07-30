@@ -3,9 +3,14 @@
   align-items: flex-start;
 }
 
+/* max-width matters as much as min-width: without it, a panel containing
+   something intrinsically wide (the OrgQ heat map sets min-width: max-content
+   inside its own scroller) stretches this column past its parent, and
+   body{overflow-x:hidden} silently clips the overflow instead of scrolling. */
 .stepMain {
   flex: 1;
   min-width: 0;
+  max-width: 100%;
 }
 
 .checklistWrap {

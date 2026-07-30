@@ -1,0 +1,47 @@
+.row {
+  display: grid;
+  grid-template-columns: 110px 1fr 56px;
+  gap: 10px;
+  align-items: center;
+  padding: 5px 0;
+  font-size: var(--fs-body);
+}
+
+.label {
+  color: var(--text-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.track {
+  height: 6px;
+  background: var(--inset);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 3px;
+  opacity: 0.65;
+  transition: width 0.25s ease;
+}
+
+.fill[data-complete="true"] {
+  background: var(--band-thriving);
+  opacity: 1;
+}
+
+.count {
+  color: var(--text-faint);
+  text-align: right;
+  font-size: var(--fs-sub);
+}
+
+@media (max-width: 760px) {
+  .row {
+    grid-template-columns: 90px 1fr 52px;
+  }
+}

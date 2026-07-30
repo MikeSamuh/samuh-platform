@@ -27,6 +27,18 @@
   margin-bottom: 12px;
 }
 
+.journeyGroup {
+  margin-bottom: 14px;
+}
+
+.journeyLabel {
+  font-size: var(--fs-eyebrow);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-faint);
+  margin-bottom: 4px;
+}
+
 .stepRow {
   display: flex;
   align-items: center;

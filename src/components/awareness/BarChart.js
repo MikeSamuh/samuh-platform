@@ -3,7 +3,18 @@
 import { Star } from "lucide-react";
 import styles from "./BarChart.module.css";
 
-export default function BarChart({ title, rows, color, authors = [], votes = {}, onVote }) {
+// `max` is the value a full-width bar represents — 9 for the team vote charts,
+// 100 where the rows are percentages.
+export default function BarChart({
+  title,
+  rows,
+  color,
+  max = 9,
+  suffix = "",
+  authors = [],
+  votes = {},
+  onVote,
+}) {
   return (
     <div className={styles.card}>
       <div className={styles.title}>{title}</div>
@@ -20,9 +31,12 @@ export default function BarChart({ title, rows, color, authors = [], votes = {},
               <div className={styles.track}>
                 <div
                   className={styles.bar}
-                  style={{ width: `${(row.value / 9) * 100}%`, background: color }}
+                  style={{ width: `${(row.value / max) * 100}%`, background: color }}
                 >
-                  <span className={styles.value}>{row.value}</span>
+                  <span className={styles.value}>
+                    {row.value}
+                    {suffix}
+                  </span>
                 </div>
               </div>
               {onVote && (

@@ -3,8 +3,7 @@
 import { useEffect, useState } from "react";
 import { Check, Minus, Users, UserCheck, Play, Flame } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
-import { steps } from "@/lib/steps";
-import { stepTasks } from "@/lib/stepTasks";
+import { journeyList } from "@/lib/journeys";
 import { getAuthors } from "@/lib/authors";
 import styles from "./AdminDashboard.module.css";
 
@@ -118,27 +117,36 @@ export default function AdminDashboard() {
               </span>
             </div>
 
-            {steps.map((step) => {
-              const tasks = stepTasks[step.id] || [];
-              const checked = team.checks[step.id] || [];
-              const done = tasks.filter((t) => checked.includes(t.id)).length;
-              const complete = tasks.length > 0 && done === tasks.length;
-              return (
-                <div key={step.id} className={styles.stepRow}>
-                  <span className={styles.stepLabel}>{step.label}</span>
-                  <div className={styles.track}>
-                    <div
-                      className={styles.fill}
-                      data-complete={complete}
-                      style={{ width: `${tasks.length ? (done / tasks.length) * 100 : 0}%` }}
-                    />
-                  </div>
-                  <span className={styles.stepCount}>
-                    {done} / {tasks.length}
-                  </span>
-                </div>
-              );
-            })}
+            {/* Grouped by journey — otherwise a second journey's progress rows
+                would land in the data but render nowhere. */}
+            {journeyList.map((journey) => (
+              <div key={journey.id} className={styles.journeyGroup}>
+                <div className={styles.journeyLabel}>{journey.label}</div>
+                {journey.steps.map((step) => {
+                  const tasks = journey.stepTasks[step.id] || [];
+                  const checked = team.checks[step.id] || [];
+                  const done = tasks.filter((t) => checked.includes(t.id)).length;
+                  const complete = tasks.length > 0 && done === tasks.length;
+                  return (
+                    <div key={step.id} className={styles.stepRow}>
+                      <span className={styles.stepLabel}>{step.label}</span>
+                      <div className={styles.track}>
+                        <div
+                          className={styles.fill}
+                          data-complete={complete}
+                          style={{
+                            width: `${tasks.length ? (done / tasks.length) * 100 : 0}%`,
+                          }}
+                        />
+                      </div>
+                      <span className={styles.stepCount}>
+                        {done} / {tasks.length}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
 
             <div className={styles.milestones}>
               {milestones.map(({ id, label, icon: Icon, done }) => (
