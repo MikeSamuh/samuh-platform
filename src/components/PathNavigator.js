@@ -9,10 +9,19 @@ export default function PathNavigator({
   onSelect,
   unlockedIndex = allSteps.length - 1,
 }) {
+  const activeIndex = Math.max(
+    0,
+    steps.findIndex((s) => s.id === activeStepId)
+  );
+  // Fraction of the track to fill, 0 → 1 across the dots.
+  const progress = steps.length > 1 ? activeIndex / (steps.length - 1) : 0;
+
   return (
     <nav className={styles.nav} aria-label="Team journey" data-tour="path">
-      <div className={styles.line} />
-      <div className={styles.steps}>
+      <div
+        className={styles.steps}
+        style={{ "--step-count": steps.length, "--progress": progress }}
+      >
         {steps.map((step, index) => {
           const locked = index > unlockedIndex;
           return (
@@ -21,6 +30,7 @@ export default function PathNavigator({
               type="button"
               className={styles.step}
               data-active={step.id === activeStepId}
+              data-done={index < activeIndex}
               data-locked={locked}
               aria-current={step.id === activeStepId ? "step" : undefined}
               aria-disabled={locked}

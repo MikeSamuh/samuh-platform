@@ -1,24 +1,50 @@
 .nav {
-  position: relative;
-  padding: 32px 48px 24px;
+  padding: 28px 48px 22px;
+  overflow-x: auto;
+  scrollbar-width: none;
 }
 
-.line {
+.nav::-webkit-scrollbar {
+  display: none;
+}
+
+/* Equal columns so dots are evenly spaced whatever the step count, and the
+   track can be inset to land exactly on the first and last dot centres. */
+.steps {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--step-count, 5), minmax(96px, 1fr));
+  min-width: max-content;
+}
+
+.steps::before,
+.steps::after {
+  content: "";
   position: absolute;
-  left: 48px;
-  right: 48px;
-  top: 43px;
+  top: 9px;
   height: 2px;
+  left: calc(50% / var(--step-count, 5));
+  border-radius: 2px;
+}
+
+.steps::before {
+  right: calc(50% / var(--step-count, 5));
   background: var(--border);
 }
 
-.steps {
-  position: relative;
-  display: flex;
-  justify-content: space-between;
+/* Filled portion up to the active step. */
+.steps::after {
+  width: calc(
+    (100% - (100% / var(--step-count, 5))) * var(--progress, 0)
+  );
+  background: var(--accent);
+  opacity: 0.55;
+  transition: width 0.25s ease;
 }
 
 .step {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -26,19 +52,19 @@
   background: none;
   border: none;
   cursor: pointer;
-  padding: 4px;
+  padding: 0 6px;
 }
 
 .dot {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
-  background: var(--card);
+  background: var(--surface);
   border: 2px solid var(--text-faint);
   transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
 }
 
-.step:hover .dot {
+.step:hover:not([data-locked="true"]) .dot {
   border-color: var(--text-dim);
 }
 
@@ -48,14 +74,23 @@
 }
 
 .label {
-  font-size: var(--fs-eyebrow);
+  font-size: var(--fs-body);
   color: var(--text-dim);
+  white-space: nowrap;
   transition: color 0.15s ease;
+}
+
+/* Steps already completed read as done, not just un-active. */
+.step[data-done="true"] .dot {
+  background: var(--accent);
+  border-color: var(--accent);
+  opacity: 0.6;
 }
 
 .step[data-active="true"] .dot {
   background: var(--accent);
   border-color: var(--accent);
+  opacity: 1;
   box-shadow: 0 0 0 4px rgba(74, 158, 255, 0.25);
 }
 
@@ -66,39 +101,32 @@
 
 .step[data-locked="true"] {
   cursor: not-allowed;
-  opacity: 0.45;
 }
 
-.step[data-locked="true"]:hover .dot {
-  border-color: var(--text-faint);
+.step[data-locked="true"] .dot {
+  border-color: var(--border);
+}
+
+.step[data-locked="true"] .label {
+  color: var(--text-faint);
 }
 
 @media (max-width: 760px) {
   .nav {
-    padding: 20px 0 16px;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-
-  .nav::-webkit-scrollbar {
-    display: none;
-  }
-
-  .line {
-    left: 16px;
-    right: 16px;
-    top: 39px;
+    padding: 22px 0 18px;
   }
 
   .steps {
-    min-width: max-content;
-    gap: 26px;
+    grid-template-columns: repeat(var(--step-count, 5), minmax(88px, 1fr));
     padding: 0 16px;
-    justify-content: flex-start;
   }
 
-  .label {
-    font-size: var(--fs-body);
-    white-space: nowrap;
+  .steps::before,
+  .steps::after {
+    left: calc(16px + 50% / var(--step-count, 5));
+  }
+
+  .steps::before {
+    right: calc(16px + 50% / var(--step-count, 5));
   }
 }

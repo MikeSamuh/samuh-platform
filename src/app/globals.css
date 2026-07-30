@@ -23,13 +23,13 @@
   --practice-icon: #d96a8a;
 
 
-  /* Type scale — titles 14, body 11, labels 9. */
-  --fs-eyebrow: 9px;    /* uppercase micro-labels */
-  --fs-body: 11px;      /* body copy, inputs, buttons */
-  --fs-sub: 10px;       /* subtitles under a title */
-  --fs-title: 14px;     /* card and section titles */
-  --fs-heading: 18px;   /* panel headings */
-  --fs-display: 27px;   /* hero numbers */
+  /* Type scale — titles 17, body 13, labels 11. */
+  --fs-eyebrow: 11px;   /* uppercase micro-labels */
+  --fs-body: 13px;      /* body copy, inputs, buttons */
+  --fs-sub: 12px;       /* subtitles under a title */
+  --fs-title: 17px;     /* card and section titles */
+  --fs-heading: 22px;   /* panel headings */
+  --fs-display: 32px;   /* hero numbers */
 
   color-scheme: dark;
 }
@@ -75,4 +75,16 @@ button {
 ::selection {
   background: var(--accent);
   color: #fff;
+}
+
+/* Mobile: type 20% larger — small screens are held closer but read worse. */
+@media (max-width: 760px) {
+  :root {
+    --fs-eyebrow: 13px;
+    --fs-body: 16px;
+    --fs-sub: 14px;
+    --fs-title: 20px;
+    --fs-heading: 26px;
+    --fs-display: 38px;
+  }
 }

@@ -25,6 +25,17 @@ export default function MetaphorCards({ currentMember, picks, onSave }) {
       name !== (savedParsed?.name || "") ||
       why !== (savedParsed?.why || ""));
 
+  // Picking a different card starts fresh — the previous card's name and
+  // reason don't belong to it. Returning to your saved card restores it.
+  function selectCard(nextId) {
+    if (nextId === cardId) return;
+    setCardId(nextId);
+    const isSavedCard = nextId === saved?.cardId;
+    setName(isSavedCard ? savedParsed?.name || "" : "");
+    setWhy(isSavedCard ? savedParsed?.why || "" : "");
+    setJustSaved(false);
+  }
+
   async function handleSave() {
     if (!currentMember || !cardId) return;
     await onSave(currentMember.id, cardId, name, why);
@@ -96,7 +107,7 @@ export default function MetaphorCards({ currentMember, picks, onSave }) {
             type="button"
             className={styles.cardButton}
             data-selected={cardId === card.id}
-            onClick={() => currentMember && setCardId(card.id)}
+            onClick={() => currentMember && selectCard(card.id)}
             disabled={!currentMember}
             aria-label={card.name}
             title={card.name}
