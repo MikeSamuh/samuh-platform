@@ -6,7 +6,6 @@ import StepChecklist from "@/components/StepChecklist";
 import TourCard from "@/components/TourCard";
 import GuidedTour from "@/components/GuidedTour";
 import { isStepComplete, unlockedIndexFor, visibleStepsFor } from "@/lib/journeys/progress";
-import { burstConfetti } from "@/lib/confetti";
 import styles from "./JourneyView.module.css";
 
 // One journey, rendered from its descriptor: the step path, the walkthrough
@@ -36,7 +35,7 @@ export default function JourneyView({
   // Only this journey's own step rows count. taskChecks also carries reserved
   // non-step keys (the org roster, cut fields, ritual keepers, canvases), and
   // watching the whole blob meant adding a roster row read as "a task changed"
-  // — advancing the step and firing the confetti for nothing.
+  // and jumped the user to the next step.
   const stepSignature = JSON.stringify(
     journey.steps.map((s) => team.taskChecks[s.id] || [])
   );
@@ -50,9 +49,6 @@ export default function JourneyView({
     seenChecks.current = signature;
     if (firstPass || unchanged) return;
     if (!isStepComplete(journey, activeStepId, team.taskChecks)) return;
-
-    // Finishing a step is the whole point of the step — mark it.
-    burstConfetti();
 
     const index = visibleSteps.findIndex((s) => s.id === activeStepId);
     if (index !== -1 && index < visibleSteps.length - 1) {
