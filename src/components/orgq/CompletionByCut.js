@@ -13,9 +13,16 @@ export default function CompletionByCut({
   people,
   cutFields = [],
   hiddenCuts = [],
+  cutValues = [],
+  hiddenValues = [],
   launched,
 }) {
-  const { field, cuts } = primaryCuts(people, cutFields, null, hiddenCuts);
+  const { field, cuts } = primaryCuts(people, {
+    fields: cutFields,
+    hiddenFields: hiddenCuts,
+    declared: cutValues,
+    hiddenValues,
+  });
 
   const rows = cuts.map((cut) => ({
     label: cut.value,

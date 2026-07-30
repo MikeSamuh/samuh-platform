@@ -1,15 +1,13 @@
 "use client";
 
 import { LayoutGrid } from "lucide-react";
-import { cutsFor } from "@/lib/orgq/roster";
 import { cutScore, seededScore } from "@/lib/orgq/sampleData";
 import shared from "./Orgq.module.css";
 import styles from "./ValueMatrix.module.css";
 
 // Need against value, so you can sequence which groups get a team journey
 // first. Top-right is where the work pays back fastest.
-export default function ValueMatrix({ people, cutKey, cutLabel }) {
-  const cuts = cutsFor(people, cutKey);
+export default function ValueMatrix({ cuts, cutLabel }) {
   const field = cutLabel.toLowerCase();
 
   // `cut.value` is the cut's name; the two axes get their own names so they

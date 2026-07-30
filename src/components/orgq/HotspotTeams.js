@@ -1,7 +1,6 @@
 "use client";
 
 import { Flame } from "lucide-react";
-import { cutsFor } from "@/lib/orgq/roster";
 import { bandFor, cutScore, needsFor } from "@/lib/orgq/sampleData";
 import shared from "./Orgq.module.css";
 
@@ -9,8 +8,7 @@ const TOP_N = 6;
 
 // The groups the heat map surfaces first, ranked worst-scoring, with what each
 // one most needs. These are the teams to start a journey with.
-export default function HotspotTeams({ people, cutKey, cutLabel }) {
-  const cuts = cutsFor(people, cutKey);
+export default function HotspotTeams({ cuts, cutLabel }) {
   const field = cutLabel.toLowerCase();
 
   const ranked = cuts

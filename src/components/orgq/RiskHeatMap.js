@@ -1,7 +1,6 @@
 "use client";
 
 import { Grid3x3 } from "lucide-react";
-import { cutsFor } from "@/lib/orgq/roster";
 import { bandFor, bandLegend, orgDimensions, seededScore } from "@/lib/orgq/sampleData";
 import shared from "./Orgq.module.css";
 import styles from "./RiskHeatMap.module.css";
@@ -19,8 +18,7 @@ function dotSize(score) {
   return Math.round(MIN_DOT + need * (MAX_DOT - MIN_DOT));
 }
 
-export default function RiskHeatMap({ people, cutKey, cutLabel }) {
-  const cuts = cutsFor(people, cutKey);
+export default function RiskHeatMap({ cuts, cutLabel }) {
 
   return (
     <div className={shared.card} data-tour="heatmap">

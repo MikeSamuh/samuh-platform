@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
-import { decodePerson, encodePerson } from "@/lib/orgq/roster";
+import { decodePerson, encodePerson, valueFor, valueKey } from "@/lib/orgq/roster";
 
 const EMPTY = {
   team: null,
@@ -325,6 +325,35 @@ export function useTeamData(teamId, userId) {
       await actions.uncompleteTask("orgq-hidden-cuts", key);
     },
 
+    // Individual groups within a cut. Declaring one lets an org set out its
+    // structure before the roster catches up — a region can exist with nobody
+    // in it yet.
+    async addOrgCutValue(field, value) {
+      const trimmed = value.trim();
+      if (!field || !trimmed) return;
+      const key = valueKey(field, trimmed);
+      // Re-adding something previously removed just un-removes it.
+      await actions.uncompleteTask("orgq-hidden-values", key);
+      if ((data.taskChecks["orgq-cut-values"] || []).includes(key)) return;
+      await actions.completeTask("orgq-cut-values", key);
+    },
+
+    // Removing a group never edits the roster. If it only existed because it
+    // was declared, drop the declaration; if people carry the value, record it
+    // as removed so it stops showing up in the cuts and the charts.
+    async removeOrgCutValue(field, value) {
+      const key = valueKey(field, value);
+      await actions.uncompleteTask("orgq-cut-values", key);
+      const stillInRoster = (data.taskChecks["orgq-roster"] || [])
+        .map(decodePerson)
+        .some((p) => valueFor(p, field) === value);
+      if (stillInRoster) await actions.completeTask("orgq-hidden-values", key);
+    },
+
+    async restoreOrgCutValue(field, value) {
+      await actions.uncompleteTask("orgq-hidden-values", valueKey(field, value));
+    },
+
     async setOrgName(name) {
       await setSingleValue("orgq-org-name", name.trim());
       if (name.trim()) await actions.completeTask("orgq-prepare", "org-name");
@@ -495,6 +524,8 @@ export function useTeamData(teamId, userId) {
     orgStewards: data.taskChecks["orgq-stewards"] || [],
     orgCutFields: data.taskChecks["orgq-cut-fields"] || [],
     orgHiddenCuts: data.taskChecks["orgq-hidden-cuts"] || [],
+    orgCutValues: data.taskChecks["orgq-cut-values"] || [],
+    orgHiddenValues: data.taskChecks["orgq-hidden-values"] || [],
     orgName: (data.taskChecks["orgq-org-name"] || [])[0] || null,
     packageSize: (data.taskChecks["orgq-package"] || [])[0] || null,
     orgLaunched: (data.taskChecks["orgq-launch"] || []).includes("launch-survey"),

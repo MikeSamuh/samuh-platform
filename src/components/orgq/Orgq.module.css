@@ -164,7 +164,49 @@
 }
 
 .cutGroup {
-  margin-bottom: 12px;
+  margin-bottom: 16px;
+}
+
+/* Adding a group to a cut — narrower than the top-level add, so the two don't
+   read as the same control. */
+.valueAddRow {
+  display: flex;
+  gap: 8px;
+  margin-top: 9px;
+  max-width: 340px;
+}
+
+.valueAddRow .input {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--fs-sub);
+  padding: 6px 10px;
+}
+
+.valueAddRow .button {
+  font-size: var(--fs-sub);
+  padding: 6px 12px;
+}
+
+.removedRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 9px;
+}
+
+.removedLabel {
+  font-size: var(--fs-eyebrow);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-faint);
+}
+
+@media (max-width: 760px) {
+  .valueAddRow {
+    max-width: none;
+  }
 }
 
 .cutGroup:last-child {

@@ -93,34 +93,74 @@ export function valueFor(person, key) {
   return (value || "").trim();
 }
 
-export function cutsFor(people, key) {
+// Individual cut values are addressed as "field::value" so declarations and
+// hidden entries can share one reserved row each. A value containing "::" would
+// be ambiguous; nothing produces one, and the split below takes only the first
+// separator so a stray one degrades rather than breaks.
+export const valueKey = (field, value) => `${field}::${value}`;
+
+export function parseValueKey(raw) {
+  const at = raw.indexOf("::");
+  if (at === -1) return null;
+  return { field: raw.slice(0, at), value: raw.slice(at + 2) };
+}
+
+function keysFor(entries, field) {
+  const out = new Set();
+  for (const raw of entries) {
+    const parsed = parseValueKey(raw);
+    if (parsed && parsed.field === field) out.add(parsed.value);
+  }
+  return out;
+}
+
+// The groups within a cut. Values come from the roster, plus any the org has
+// declared up front (so a region can exist before anyone is assigned to it),
+// minus any it has removed. Declared-but-empty groups are kept — an org
+// structure is real whether or not the roster has caught up.
+export function cutsFor(people, key, declared = [], hidden = []) {
   const counts = new Map();
+  for (const value of keysFor(declared, key)) counts.set(value, 0);
+
   for (const person of people) {
     const value = valueFor(person, key);
     if (!value) continue;
     counts.set(value, (counts.get(value) || 0) + 1);
   }
+
+  const removed = keysFor(hidden, key);
   return [...counts.entries()]
+    .filter(([value]) => !removed.has(value))
     .map(([value, count]) => ({ value, count }))
     .sort((a, b) => b.count - a.count || a.value.localeCompare(b.value));
+}
+
+// Removed values, so they can be offered back.
+export function hiddenCutValues(key, hidden = []) {
+  return [...keysFor(hidden, key)].sort();
 }
 
 // Which cut the org-level visuals hang off. Honour an explicit choice when it
 // still has values behind it; otherwise fall back to the first populated field,
 // so a partly-filled roster still shows something meaningful.
-export function primaryCuts(people, customFields = [], preferredKey = null, hiddenKeys = []) {
-  const fields = allCutFields(customFields, hiddenKeys);
+// The aggregate helpers take one options bag rather than five positional
+// arguments, since they all need the same four lists.
+export function primaryCuts(
+  people,
+  { fields = [], hiddenFields = [], declared = [], hiddenValues = [], preferred = null } = {}
+) {
+  const available = allCutFields(fields, hiddenFields);
 
-  if (preferredKey) {
-    const cuts = cutsFor(people, preferredKey);
+  if (preferred) {
+    const cuts = cutsFor(people, preferred, declared, hiddenValues);
     if (cuts.length > 0) {
-      const field = fields.find((f) => f.key === preferredKey);
-      return { field: field?.label || preferredKey, key: preferredKey, cuts };
+      const field = available.find((f) => f.key === preferred);
+      return { field: field?.label || preferred, key: preferred, cuts };
     }
   }
 
-  for (const field of fields) {
-    const cuts = cutsFor(people, field.key);
+  for (const field of available) {
+    const cuts = cutsFor(people, field.key, declared, hiddenValues);
     if (cuts.length > 0) return { field: field.label, key: field.key, cuts };
   }
 
@@ -129,8 +169,11 @@ export function primaryCuts(people, customFields = [], preferredKey = null, hidd
 
 // Cut fields that actually have data behind them — the only ones worth
 // offering as an axis.
-export function populatedCutFields(people, customFields = [], hiddenKeys = []) {
-  return allCutFields(customFields, hiddenKeys).filter(
-    (f) => cutsFor(people, f.key).length > 0
+export function populatedCutFields(
+  people,
+  { fields = [], hiddenFields = [], declared = [], hiddenValues = [] } = {}
+) {
+  return allCutFields(fields, hiddenFields).filter(
+    (f) => cutsFor(people, f.key, declared, hiddenValues).length > 0
   );
 }
