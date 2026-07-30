@@ -4,7 +4,6 @@ import { Play, CheckCircle2 } from "lucide-react";
 import MediaAccordion from "@/components/MediaAccordion";
 import OrgQStewards from "@/components/orgq/OrgQStewards";
 import CompletionByCut from "@/components/orgq/CompletionByCut";
-import FeatureNote from "@/components/orgq/FeatureNote";
 import { orgqLaunchMedia } from "@/lib/orgq/media";
 import panelStyles from "../Panel.module.css";
 import styles from "../LaunchPanel.module.css";
@@ -55,14 +54,6 @@ export default function OrgLaunchPanel({ team, completeTask }) {
       </div>
 
       <CompletionByCut people={team.orgRoster} launched={launched} />
-
-      <FeatureNote
-        title="Scoring and org units"
-        points={[
-          "Every group gets its own value score, with a how-to explaining what the score means.",
-          "People confirm their own org unit and team as they take the survey, so the cuts stay accurate.",
-        ]}
-      />
     </div>
   );
 }

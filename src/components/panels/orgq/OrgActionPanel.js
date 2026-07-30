@@ -3,7 +3,6 @@
 import { CalendarCheck, Users, Unlock } from "lucide-react";
 import MediaAccordion from "@/components/MediaAccordion";
 import CoachingCard from "@/components/CoachingCard";
-import FeatureNote from "@/components/orgq/FeatureNote";
 import { orgqActionMedia } from "@/lib/orgq/media";
 import { bookingLinks } from "@/lib/bookingLinks";
 import shared from "@/components/orgq/Orgq.module.css";
@@ -76,13 +75,6 @@ export default function OrgActionPanel({ team, completeTask }) {
           onItemOpened={(id) => completeTask("orgq-action", id)}
         />
       </div>
-
-      <FeatureNote
-        title="Access model"
-        points={[
-          "Access opens at team-member level — everyone on the roster reaches their own team's journey, and nobody else's.",
-        ]}
-      />
     </div>
   );
 }

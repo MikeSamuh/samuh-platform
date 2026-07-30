@@ -5,7 +5,6 @@ import TeamQVisual from "@/components/prepare/TeamQVisual";
 import RiskHeatMap from "@/components/orgq/RiskHeatMap";
 import HotspotTeams from "@/components/orgq/HotspotTeams";
 import ValueMatrix from "@/components/orgq/ValueMatrix";
-import FeatureNote from "@/components/orgq/FeatureNote";
 import { orgqResultsMedia } from "@/lib/orgq/media";
 import panelStyles from "../Panel.module.css";
 
@@ -28,15 +27,6 @@ export default function OrgResultsPanel({ team, completeTask }) {
           onItemOpened={(id) => completeTask("orgq-results", id)}
         />
       </div>
-
-      <FeatureNote
-        title="Who sees what"
-        points={[
-          "Each team and org cut sees its own results — leaders see their area, the C-suite sees the whole org.",
-          "The heat map flags high-risk groups alongside what they need, so the readout comes with a next step.",
-          "The priority matrix sequences the work: highest need against highest value.",
-        ]}
-      />
     </div>
   );
 }

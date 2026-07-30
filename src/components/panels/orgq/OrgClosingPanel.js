@@ -5,7 +5,6 @@ import MediaAccordion from "@/components/MediaAccordion";
 import CoachingCard from "@/components/CoachingCard";
 import TeamJourneyReview from "@/components/orgq/TeamJourneyReview";
 import BenchmarkCompare from "@/components/orgq/BenchmarkCompare";
-import FeatureNote from "@/components/orgq/FeatureNote";
 import { orgqClosingMedia } from "@/lib/orgq/media";
 import { bookingLinks } from "@/lib/bookingLinks";
 import panelStyles from "../Panel.module.css";
@@ -43,14 +42,6 @@ export default function OrgClosingPanel({ team, completeTask }) {
         buttonLabel="Launch TeamQ"
         href={null}
         onOpen={() => completeTask("orgq-closing", "launch-teamq")}
-      />
-
-      <FeatureNote
-        title="Closing the cycle"
-        points={[
-          "TeamQ scores benchmark against the OrgQ baseline, so you can see what actually moved.",
-          "The next cycle starts from where this one finished — the roster and cuts carry over.",
-        ]}
       />
     </div>
   );

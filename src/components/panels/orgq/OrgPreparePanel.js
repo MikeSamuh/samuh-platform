@@ -6,7 +6,6 @@ import CoachingCard from "@/components/CoachingCard";
 import OrgSetup from "@/components/orgq/OrgSetup";
 import OrgRoster from "@/components/orgq/OrgRoster";
 import OrgCuts from "@/components/orgq/OrgCuts";
-import FeatureNote from "@/components/orgq/FeatureNote";
 import { orgqPrepareMedia } from "@/lib/orgq/media";
 import panelStyles from "../Panel.module.css";
 
@@ -49,14 +48,6 @@ export default function OrgPreparePanel({ team, completeTask }) {
         buttonLabel="Send invites"
         href={null}
         onOpen={() => completeTask("orgq-prepare", "invites")}
-      />
-
-      <FeatureNote
-        title="Data handling"
-        points={[
-          "GDPR and SOC 2 compliant — your roster and responses stay inside your org's account.",
-          "Documentation on exactly what's collected, where it's stored and how long it's kept.",
-        ]}
       />
     </div>
   );
