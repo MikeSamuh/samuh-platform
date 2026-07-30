@@ -1,17 +1,16 @@
 "use client";
 
-import {
-  LayoutDashboard,
-  BookOpen,
-  Bell,
-  Link2,
-  Activity,
-} from "lucide-react";
+import { BookOpen, Bell, Link2, Activity } from "lucide-react";
 import styles from "./IconRail.module.css";
 
-export default function IconRail({ view = "journey", onSelectView, showAdmin = false }) {
+export default function IconRail({
+  view = "journey",
+  onSelectView,
+  showAdmin = false,
+  journeyItems = [],
+}) {
   const topItems = [
-    { id: "journey", icon: LayoutDashboard, label: "Journey" },
+    ...journeyItems.map((j) => ({ id: j.id, icon: j.icon, label: j.label })),
     { id: "kit", icon: BookOpen, label: "Ritual Keeper Kit" },
     { id: "notifications", icon: Bell, label: "Notifications" },
     ...(showAdmin ? [{ id: "surveys", icon: Link2, label: "Link surveys" }] : []),

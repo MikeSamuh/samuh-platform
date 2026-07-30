@@ -2,8 +2,6 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
-import { steps } from "@/lib/steps";
-import { stepTasks } from "@/lib/stepTasks";
 
 const EMPTY = {
   team: null,
@@ -375,19 +373,8 @@ export function useTeamData(teamId, userId) {
     },
   };
 
-  function isStepComplete(stepId, checks = data.taskChecks) {
-    const tasks = stepTasks[stepId] || [];
-    const checked = checks[stepId] || [];
-    return tasks.length > 0 && tasks.every((t) => checked.includes(t.id));
-  }
-
-  let unlockedIndex = steps.length - 1;
-  for (let i = 0; i < steps.length; i++) {
-    if (!isStepComplete(steps[i].id)) {
-      unlockedIndex = i;
-      break;
-    }
-  }
+  // Step completion and unlock live in @/lib/journeys/progress — they depend on
+  // which journey is being walked, and this layer serves both.
 
   // Legacy single keeper (team_state) folds into the two-keeper list.
   const ritualKeepers = (data.taskChecks["ritual-keepers"] || []).length
@@ -402,8 +389,6 @@ export function useTeamData(teamId, userId) {
     error,
     dismissError: () => setError(null),
     currentMember,
-    unlockedIndex,
-    isStepComplete,
     ritualKeepers,
     canvasPractices: data.taskChecks["canvas-practices"] || [],
     defaultCanvasName: (data.taskChecks["canvas-default-name"] || [])[0] || null,

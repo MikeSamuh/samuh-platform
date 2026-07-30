@@ -1,43 +1,20 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
-import { steps } from "@/lib/steps";
-import { stepTasks } from "@/lib/stepTasks";
-import { tours } from "@/lib/tours";
 import { useAuth } from "@/lib/AuthContext";
 import { useTeamData } from "@/lib/useTeamData";
+import { journeys, journeyList, isJourneyView } from "@/lib/journeys";
+import { visibleStepsFor } from "@/lib/journeys/progress";
 import IconRail from "@/components/IconRail";
-import PathNavigator from "@/components/PathNavigator";
-import StepChecklist from "@/components/StepChecklist";
+import JourneyView from "@/components/JourneyView";
 import AdminDashboard from "@/components/AdminDashboard";
 import ReadinessKit from "@/components/views/ReadinessKit";
 import Notifications from "@/components/views/Notifications";
 import SurveyLinks from "@/components/views/SurveyLinks";
-import GuidedTour from "@/components/GuidedTour";
 import TeamName from "@/components/TeamName";
-import TourCard from "@/components/TourCard";
 import RoleSwitcher from "@/components/RoleSwitcher";
-import PreparePanel from "@/components/panels/PreparePanel";
-import LaunchPanel from "@/components/panels/LaunchPanel";
-import DiscoverPanel from "@/components/panels/DiscoverPanel";
-import AwarenessPanel from "@/components/panels/AwarenessPanel";
-import BelongingPanel from "@/components/panels/BelongingPanel";
-import ActionPanel from "@/components/panels/ActionPanel";
 import styles from "./AppShell.module.css";
-
-const panels = {
-  prepare: PreparePanel,
-  launch: LaunchPanel,
-  discover: DiscoverPanel,
-  awareness: AwarenessPanel,
-  belonging: BelongingPanel,
-  action: ActionPanel,
-};
-
-// Prepare and Launch are the manager's setup work; team members join the
-// journey at Discover.
-const MEMBER_HIDDEN_STEPS = ["prepare", "launch"];
 
 // Where each person last was, so a refresh doesn't send them back to step one.
 // Keyed per profile so switching roles doesn't inherit the other's place.
@@ -46,57 +23,67 @@ const navKey = (profileId) => `ritualizer:nav:${profileId}`;
 function readSavedNav(profileId) {
   if (!profileId || typeof window === "undefined") return null;
   try {
-    return JSON.parse(window.localStorage.getItem(navKey(profileId))) || null;
+    const raw = JSON.parse(window.localStorage.getItem(navKey(profileId)));
+    if (!raw) return null;
+    // v1 stored a single `activeStepId`, back when there was only one journey.
+    if (!raw.steps) {
+      return {
+        view: raw.view,
+        steps: raw.activeStepId ? { journey: raw.activeStepId } : {},
+      };
+    }
+    return raw;
   } catch {
     return null;
   }
 }
 
+const STATIC_VIEWS = ["kit", "notifications"];
+const STAFF_VIEWS = ["admin", "surveys"];
+
 export default function AppShell() {
   const { profile, isStaff, isManager } = useAuth();
   const team = useTeamData(profile?.team_id, profile?.id);
 
-  const visibleSteps =
-    isManager || isStaff
-      ? steps
-      : steps.filter((s) => !MEMBER_HIDDEN_STEPS.includes(s.id));
+  const roles = { isManager, isStaff };
 
-  const [activeStepId, setActiveStepId] = useState(visibleSteps[0].id);
-  const [view, setView] = useState("journey");
-  const [tourActive, setTourActive] = useState(false);
-
-  const ActivePanel = panels[activeStepId];
-  const activeStep = steps.find((s) => s.id === activeStepId);
-
-  // Steps unlock in the order this role sees them.
-  let unlockedIndex = visibleSteps.length - 1;
-  for (let i = 0; i < visibleSteps.length; i++) {
-    if (!team.isStepComplete(visibleSteps[i].id)) {
-      unlockedIndex = i;
-      break;
-    }
+  // One rule for who may open what, consulted by the rail, the click guard and
+  // the saved-view restore — so a hidden rail item can't be reached by a stale
+  // localStorage value.
+  function canOpenView(id) {
+    if (STATIC_VIEWS.includes(id)) return true;
+    if (STAFF_VIEWS.includes(id)) return isStaff;
+    if (isJourneyView(id)) return journeys[id].visibleFor(roles);
+    return false;
   }
 
+  const defaultStepFor = (journey) => visibleStepsFor(journey, roles)[0].id;
+  const defaultView = isStaff ? "admin" : "journey";
+
+  const [stepByJourney, setStepByJourney] = useState(() =>
+    Object.fromEntries(journeyList.map((j) => [j.id, j.steps[0].id]))
+  );
+  const [view, setView] = useState(defaultView);
+
   // Restore the last place on load / profile switch, falling back to the
-  // sensible default for the role. Waits for team data so a restored step
-  // isn't rejected by unlock rules that haven't loaded yet.
+  // sensible default for the role. Waits for team data so a restored step isn't
+  // rejected by unlock rules that haven't loaded yet.
   useEffect(() => {
     if (!profile?.id || team.loading) return;
     const saved = readSavedNav(profile.id);
-    const savedStepOk =
-      saved?.activeStepId && visibleSteps.some((s) => s.id === saved.activeStepId);
-    const savedViewOk =
-      saved?.view &&
-      (saved.view === "journey" ||
-        saved.view === "kit" ||
-        saved.view === "notifications" ||
-        ((saved.view === "admin" || saved.view === "surveys") && isStaff));
 
-    setView(savedViewOk ? saved.view : isStaff ? "admin" : "journey");
-    if (savedStepOk) setActiveStepId(saved.activeStepId);
-    setTourActive(false);
+    setView(saved?.view && canOpenView(saved.view) ? saved.view : defaultView);
+    setStepByJourney(
+      Object.fromEntries(
+        journeyList.map((j) => {
+          const savedStep = saved?.steps?.[j.id];
+          const allowed = visibleStepsFor(j, roles).some((s) => s.id === savedStep);
+          return [j.id, allowed ? savedStep : defaultStepFor(j)];
+        })
+      )
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profile?.id, isStaff, team.loading]);
+  }, [profile?.id, isStaff, isManager, team.loading]);
 
   // Remember it whenever it changes.
   useEffect(() => {
@@ -104,71 +91,34 @@ export default function AppShell() {
     try {
       window.localStorage.setItem(
         navKey(profile.id),
-        JSON.stringify({ activeStepId, view })
+        JSON.stringify({ view, steps: stepByJourney })
       );
     } catch {
       // Private-mode storage failures shouldn't break navigation.
     }
-  }, [profile?.id, activeStepId, view, team.loading]);
-
-  // A role switch can leave the active step outside this role's list.
-  useEffect(() => {
-    if (!visibleSteps.some((s) => s.id === activeStepId)) {
-      setActiveStepId(visibleSteps[0].id);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isManager, isStaff]);
-
-  // Advance whenever the active step's checklist fills up, no matter which
-  // path completed the last task (checkbox, media open, co-lead select,
-  // team rename — several complete tasks inside the data layer). Only fires
-  // on a real task change, so restoring a finished step on refresh doesn't
-  // immediately bounce the user forward.
-  const seenChecks = useRef(null);
-  useEffect(() => {
-    if (view !== "journey" || team.loading) return;
-    const signature = JSON.stringify(team.taskChecks);
-    const firstPass = seenChecks.current === null;
-    const unchanged = seenChecks.current === signature;
-    seenChecks.current = signature;
-    if (firstPass || unchanged) return;
-    if (!team.isStepComplete(activeStepId)) return;
-    const index = visibleSteps.findIndex((s) => s.id === activeStepId);
-    if (index !== -1 && index < visibleSteps.length - 1) {
-      setActiveStepId(visibleSteps[index + 1].id);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [team.taskChecks, team.loading, view]);
-
-  const completeTask = team.completeTask;
-
-  async function toggleTask(stepId, taskId) {
-    const checked = (team.taskChecks[stepId] || []).includes(taskId);
-    if (checked) {
-      await team.uncompleteTask(stepId, taskId);
-    } else {
-      await team.completeTask(stepId, taskId);
-    }
-  }
-
-  function selectStep(stepId) {
-    const index = visibleSteps.findIndex((s) => s.id === stepId);
-    if (index === -1 || index > unlockedIndex) return;
-    setActiveStepId(stepId);
-    setView("journey");
-  }
+  }, [profile?.id, view, stepByJourney, team.loading]);
 
   function selectView(id) {
-    if ((id === "admin" || id === "surveys") && !isStaff) return;
+    if (!canOpenView(id)) return;
     setView(id);
-    setTourActive(false);
+  }
+
+  function selectStep(journeyId, stepId) {
+    setStepByJourney((m) => ({ ...m, [journeyId]: stepId }));
   }
 
   if (team.loading && !isStaff) return null;
 
+  const activeJourney = isJourneyView(view) && canOpenView(view) ? journeys[view] : null;
+
   return (
     <div className={styles.shell}>
-      <IconRail view={view} onSelectView={selectView} showAdmin={isStaff} />
+      <IconRail
+        view={view}
+        onSelectView={selectView}
+        showAdmin={isStaff}
+        journeyItems={journeyList.filter((j) => j.visibleFor(roles))}
+      />
       <div className={styles.main}>
         <div className={styles.header}>
           <div className={styles.brand}>
@@ -225,52 +175,18 @@ export default function AppShell() {
               Go to team progress
             </button>
           </div>
-        ) : (
-          <>
-            <PathNavigator
-              steps={visibleSteps}
-              activeStepId={activeStepId}
-              onSelect={selectStep}
-              unlockedIndex={unlockedIndex}
-            />
-            <div className={styles.stepBody}>
-              <div className={styles.stepMain}>
-                <div className={styles.tourSlot}>
-                  <TourCard
-                    stepLabel={activeStep?.label}
-                    onStart={() => setTourActive(true)}
-                    completed={(team.taskChecks[activeStepId] || []).includes("tour")}
-                  />
-                </div>
-                <ActivePanel
-                  team={team}
-                  currentMember={team.currentMember}
-                  completeTask={completeTask}
-                  canManage={isManager}
-                />
-              </div>
-              <div className={styles.checklistWrap}>
-                <StepChecklist
-                  stepId={activeStepId}
-                  tasks={stepTasks[activeStepId] || []}
-                  checked={team.taskChecks[activeStepId] || []}
-                  onToggle={toggleTask}
-                />
-              </div>
-            </div>
-          </>
-        )}
+        ) : activeJourney ? (
+          <JourneyView
+            key={activeJourney.id}
+            journey={activeJourney}
+            team={team}
+            isManager={isManager}
+            isStaff={isStaff}
+            activeStepId={stepByJourney[activeJourney.id]}
+            onSelectStep={(stepId) => selectStep(activeJourney.id, stepId)}
+          />
+        ) : null}
       </div>
-      {tourActive && (
-        <GuidedTour
-          stops={tours[activeStepId] || []}
-          onClose={() => setTourActive(false)}
-          onComplete={() => {
-            setTourActive(false);
-            completeTask(activeStepId, "tour");
-          }}
-        />
-      )}
     </div>
   );
 }
