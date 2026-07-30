@@ -6,6 +6,7 @@ import StepChecklist from "@/components/StepChecklist";
 import TourCard from "@/components/TourCard";
 import GuidedTour from "@/components/GuidedTour";
 import { isStepComplete, unlockedIndexFor, visibleStepsFor } from "@/lib/journeys/progress";
+import { burstConfetti } from "@/lib/confetti";
 import styles from "./JourneyView.module.css";
 
 // One journey, rendered from its descriptor: the step path, the walkthrough
@@ -49,6 +50,9 @@ export default function JourneyView({
     seenChecks.current = signature;
     if (firstPass || unchanged) return;
     if (!isStepComplete(journey, activeStepId, team.taskChecks)) return;
+
+    // Finishing a step is the whole point of the step — mark it.
+    burstConfetti();
 
     const index = visibleSteps.findIndex((s) => s.id === activeStepId);
     if (index !== -1 && index < visibleSteps.length - 1) {

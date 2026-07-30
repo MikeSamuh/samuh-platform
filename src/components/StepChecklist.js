@@ -23,9 +23,10 @@ export default function StepChecklist({ stepId, tasks, checked, onToggle }) {
                 checked={done}
                 onChange={() => onToggle?.(stepId, task.id)}
               />
+              {/* Labels only — the task's `sub` is still in the task tables,
+                  but the list reads better as a plain set of things to do. */}
               <label htmlFor={inputId} className={styles.labelBlock}>
                 <span className={styles.label}>{task.label}</span>
-                {task.sub && <span className={styles.sub}>{task.sub}</span>}
               </label>
             </li>
           );
