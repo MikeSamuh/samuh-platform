@@ -18,12 +18,14 @@ const COLORS = [
 ];
 
 const PIECES = 180;
-// Terminal velocity ends up around GRAVITY / (1 - DRAG) per frame — roughly
-// 3px, so a piece takes about four seconds to cross the screen.
-const GRAVITY = 0.058;
-const DRAG = 0.981;
-const FADE_AFTER = 3600; // ms before pieces start dissolving
-const MAX_LIFE = 5400;
+// Terminal velocity ends up around GRAVITY / (1 - DRAG) per frame — about 9px,
+// so a piece crosses the screen in roughly two seconds. Slow enough to read as
+// glitter drifting, quick enough that the whole thing is over before it starts
+// competing with the page.
+const GRAVITY = 0.13;
+const DRAG = 0.985;
+const FADE_AFTER = 1500; // ms before pieces start dissolving
+const MAX_LIFE = 2800;
 
 function prefersReducedMotion() {
   return (
@@ -71,7 +73,7 @@ export function burstConfetti() {
     const fromLeft = i % 2 === 0;
     // Fan from just-above-horizontal to near-vertical, biased upward.
     const angle = (18 + Math.random() * 62) * (Math.PI / 180);
-    const speed = 15 + Math.random() * 16;
+    const speed = 11 + Math.random() * 12;
     return {
       x: fromLeft ? w() * 0.08 : w() * 0.92,
       y: h() * 0.78,
