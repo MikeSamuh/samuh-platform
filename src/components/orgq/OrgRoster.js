@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { X, Upload, Download } from "lucide-react";
-import { BUILT_IN_CUTS, valueFor } from "@/lib/orgq/roster";
+import { allCutFields, valueFor } from "@/lib/orgq/roster";
 import styles from "./OrgRoster.module.css";
 
 // Deliberately simple: split on commas, match the header to the columns on
@@ -48,15 +48,21 @@ function parseCsv(text, columns) {
 // the org cuts possible — and it grows extra columns for whatever cuts the org
 // has defined for itself. Imports in bulk, since an org roster is hundreds of
 // rows rather than a handful.
-export default function OrgRoster({ people, cutFields = [], onAddMany, onRemove }) {
+export default function OrgRoster({
+  people,
+  cutFields = [],
+  hiddenCuts = [],
+  onAddMany,
+  onRemove,
+}) {
   const fileRef = useRef(null);
   const [uploadNote, setUploadNote] = useState(null);
 
+  // Columns follow the cuts, so removing a cut removes its column too.
   const columns = [
     { key: "name", label: "Name" },
     { key: "email", label: "Email" },
-    ...BUILT_IN_CUTS,
-    ...cutFields.map((label) => ({ key: label, label, custom: true })),
+    ...allCutFields(cutFields, hiddenCuts),
   ];
 
   const blankDraft = Object.fromEntries(columns.map((c) => [c.key, ""]));

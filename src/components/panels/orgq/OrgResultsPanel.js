@@ -16,8 +16,8 @@ export default function OrgResultsPanel({ team, completeTask }) {
 
   // Only offer axes that have data behind them.
   const fields = useMemo(
-    () => populatedCutFields(team.orgRoster, team.orgCutFields),
-    [team.orgRoster, team.orgCutFields]
+    () => populatedCutFields(team.orgRoster, team.orgCutFields, team.orgHiddenCuts),
+    [team.orgRoster, team.orgCutFields, team.orgHiddenCuts]
   );
 
   // A chosen cut can stop being valid when the roster changes under it.

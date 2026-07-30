@@ -313,6 +313,18 @@ export function useTeamData(teamId, userId) {
       await actions.uncompleteTask("orgq-cut-fields", label);
     },
 
+    // Built-in cuts are constants, so "removing" one records it as hidden.
+    // The roster values behind it are untouched, so putting it back restores
+    // everything rather than starting from nothing.
+    async hideOrgCut(key) {
+      if ((data.taskChecks["orgq-hidden-cuts"] || []).includes(key)) return;
+      await actions.completeTask("orgq-hidden-cuts", key);
+    },
+
+    async restoreOrgCut(key) {
+      await actions.uncompleteTask("orgq-hidden-cuts", key);
+    },
+
     async setOrgName(name) {
       await setSingleValue("orgq-org-name", name.trim());
       if (name.trim()) await actions.completeTask("orgq-prepare", "org-name");
@@ -482,6 +494,7 @@ export function useTeamData(teamId, userId) {
     orgRoster: (data.taskChecks["orgq-roster"] || []).map(decodePerson),
     orgStewards: data.taskChecks["orgq-stewards"] || [],
     orgCutFields: data.taskChecks["orgq-cut-fields"] || [],
+    orgHiddenCuts: data.taskChecks["orgq-hidden-cuts"] || [],
     orgName: (data.taskChecks["orgq-org-name"] || [])[0] || null,
     packageSize: (data.taskChecks["orgq-package"] || [])[0] || null,
     orgLaunched: (data.taskChecks["orgq-launch"] || []).includes("launch-survey"),

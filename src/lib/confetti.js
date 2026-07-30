@@ -1,14 +1,29 @@
-// A small confetti burst for finishing a step — the Trello "card hit Done"
-// moment. Canvas rather than DOM nodes so a couple of hundred pieces stay
-// cheap, and self-contained so there's no dependency to add.
+// A glitter fall for finishing a step. Canvas rather than DOM nodes so a few
+// hundred pieces stay cheap, and self-contained so there's no dependency.
+//
+// Tuned to drift rather than drop: low gravity with enough drag to reach a slow
+// terminal velocity, plus a horizontal sway, so the pieces hang in the air.
+// Each piece catches the light as it tumbles — its face brightens and takes a
+// white specular highlight when turned toward the viewer, which is what reads
+// as "shiny" rather than just "coloured".
 
-const COLORS = ["#4a9eff", "#7f77dd", "#3ba55d", "#e88a2a", "#d6409a", "#e8e9eb"];
+const COLORS = [
+  "#ffd76e", // gold
+  "#f7e7b4", // champagne
+  "#eef4ff", // silver
+  "#6fb6ff", // accent blue
+  "#a79bff", // violet
+  "#ff7ccf", // pink
+  "#6fe39a", // mint
+];
 
-const PIECES = 140;
-const GRAVITY = 0.32;
-const DRAG = 0.992;
-const FADE_AFTER = 1400; // ms before pieces start dissolving
-const MAX_LIFE = 2600;
+const PIECES = 180;
+// Terminal velocity ends up around GRAVITY / (1 - DRAG) per frame — roughly
+// 3px, so a piece takes about four seconds to cross the screen.
+const GRAVITY = 0.058;
+const DRAG = 0.981;
+const FADE_AFTER = 3600; // ms before pieces start dissolving
+const MAX_LIFE = 5400;
 
 function prefersReducedMotion() {
   return (
@@ -49,20 +64,26 @@ export function burstConfetti() {
   const h = () => window.innerHeight;
 
   // Two side cannons firing inward and up, which reads more celebratory than a
-  // single central spray.
+  // single central spray. The launch is deliberately fast and wide — the burst
+  // has to cover the screen — while gravity and drag keep the *fall* slow. A
+  // gentle launch just leaves a clump hanging over each cannon.
   const pieces = Array.from({ length: PIECES }, (_, i) => {
     const fromLeft = i % 2 === 0;
-    const spread = (Math.random() - 0.5) * 1.1;
-    const power = 11 + Math.random() * 9;
+    // Fan from just-above-horizontal to near-vertical, biased upward.
+    const angle = (18 + Math.random() * 62) * (Math.PI / 180);
+    const speed = 15 + Math.random() * 16;
     return {
-      x: fromLeft ? w() * 0.12 : w() * 0.88,
-      y: h() * 0.72,
-      vx: (fromLeft ? 1 : -1) * (power * (0.55 + Math.random() * 0.5)),
-      vy: -power * (0.85 + Math.random() * 0.6) + spread,
-      w: 6 + Math.random() * 6,
-      h: 9 + Math.random() * 7,
+      x: fromLeft ? w() * 0.08 : w() * 0.92,
+      y: h() * 0.78,
+      vx: (fromLeft ? 1 : -1) * Math.cos(angle) * speed,
+      vy: -Math.sin(angle) * speed,
+      w: 4 + Math.random() * 5,
+      h: 7 + Math.random() * 6,
       rot: Math.random() * Math.PI * 2,
-      spin: (Math.random() - 0.5) * 0.32,
+      spin: (Math.random() - 0.5) * 0.16,
+      sway: 0.5 + Math.random() * 1.1,
+      swaySpeed: 0.0011 + Math.random() * 0.0016,
+      swayPhase: Math.random() * Math.PI * 2,
       color: COLORS[i % COLORS.length],
     };
   });
@@ -88,17 +109,31 @@ export function burstConfetti() {
       p.vy += GRAVITY;
       p.vx *= DRAG;
       p.vy *= DRAG;
-      p.x += p.vx;
+      p.x += p.vx + Math.sin(elapsed * p.swaySpeed + p.swayPhase) * p.sway;
       p.y += p.vy;
       p.rot += p.spin;
 
+      // How square-on the piece is to the viewer. Foil catches the light at the
+      // turn, so this drives both the squash and the flash.
+      const facing = Math.abs(Math.cos(p.rot));
+
       ctx.save();
       ctx.translate(p.x, p.y);
-      ctx.rotate(p.rot);
-      ctx.globalAlpha = fade;
+      ctx.rotate(p.rot * 0.6);
+      ctx.globalAlpha = fade * (0.72 + facing * 0.28);
+      ctx.shadowColor = p.color;
+      ctx.shadowBlur = 6 + facing * 10;
       ctx.fillStyle = p.color;
-      // Flip the height by the spin phase so pieces read as tumbling foil.
-      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h * Math.abs(Math.cos(p.rot)));
+      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h * facing);
+
+      // Specular flash at the turn — the bit that actually reads as shiny.
+      const shine = Math.pow(facing, 7);
+      if (shine > 0.02) {
+        ctx.shadowBlur = 0;
+        ctx.globalAlpha = fade * shine * 0.9;
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h * facing * 0.55);
+      }
       ctx.restore();
     }
 

@@ -72,11 +72,20 @@ export function isBuiltInCut(key) {
 
 // A custom cut is stored and addressed by its label, so it reads the same in
 // the roster header, the cut list and the chart axes.
-export function allCutFields(customFields = []) {
+//
+// Built-in cuts can be hidden but not deleted — an org that doesn't think in
+// tenure shouldn't have to look at it, but the roster data behind it is never
+// thrown away, so putting it back restores everything.
+export function allCutFields(customFields = [], hiddenKeys = []) {
+  const hidden = new Set(hiddenKeys);
   return [
     ...BUILT_IN_CUTS,
     ...customFields.map((label) => ({ key: label, label, custom: true })),
-  ];
+  ].filter((f) => !hidden.has(f.key));
+}
+
+export function hiddenBuiltIns(hiddenKeys = []) {
+  return BUILT_IN_CUTS.filter((f) => hiddenKeys.includes(f.key));
 }
 
 export function valueFor(person, key) {
@@ -99,8 +108,8 @@ export function cutsFor(people, key) {
 // Which cut the org-level visuals hang off. Honour an explicit choice when it
 // still has values behind it; otherwise fall back to the first populated field,
 // so a partly-filled roster still shows something meaningful.
-export function primaryCuts(people, customFields = [], preferredKey = null) {
-  const fields = allCutFields(customFields);
+export function primaryCuts(people, customFields = [], preferredKey = null, hiddenKeys = []) {
+  const fields = allCutFields(customFields, hiddenKeys);
 
   if (preferredKey) {
     const cuts = cutsFor(people, preferredKey);
@@ -120,8 +129,8 @@ export function primaryCuts(people, customFields = [], preferredKey = null) {
 
 // Cut fields that actually have data behind them — the only ones worth
 // offering as an axis.
-export function populatedCutFields(people, customFields = []) {
-  return allCutFields(customFields).filter(
+export function populatedCutFields(people, customFields = [], hiddenKeys = []) {
+  return allCutFields(customFields, hiddenKeys).filter(
     (f) => cutsFor(people, f.key).length > 0
   );
 }

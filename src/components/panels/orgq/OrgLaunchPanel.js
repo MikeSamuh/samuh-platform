@@ -56,6 +56,7 @@ export default function OrgLaunchPanel({ team, completeTask }) {
       <CompletionByCut
         people={team.orgRoster}
         cutFields={team.orgCutFields}
+        hiddenCuts={team.orgHiddenCuts}
         launched={launched}
       />
     </div>

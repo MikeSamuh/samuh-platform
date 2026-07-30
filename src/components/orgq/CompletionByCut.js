@@ -9,8 +9,13 @@ import shared from "./Orgq.module.css";
 
 // Response rates while the survey is open, so you can see which parts of the
 // org need chasing. Rows are real cuts; the rates are stand-ins.
-export default function CompletionByCut({ people, cutFields = [], launched }) {
-  const { field, cuts } = primaryCuts(people, cutFields);
+export default function CompletionByCut({
+  people,
+  cutFields = [],
+  hiddenCuts = [],
+  launched,
+}) {
+  const { field, cuts } = primaryCuts(people, cutFields, null, hiddenCuts);
 
   const rows = cuts.map((cut) => ({
     label: cut.value,
