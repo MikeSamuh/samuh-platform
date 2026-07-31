@@ -12,16 +12,17 @@ import styles from "./Orgq.module.css";
 
 const SUGGESTIONS = ["Region", "Division", "Function", "Location", "Level"];
 
-// Two levels here, and they're easy to confuse.
+// Two levels, and they're easy to confuse.
 //
 // A *cut* is a dimension — Team, Manager, Region. Adding one adds a roster
-// column; removing one takes that column and its axis with it.
+// column and an axis you can read results by; that lives in the strip at the
+// bottom of this card.
 //
 // A *group* is one value inside a cut — Engineering, EMEA. Groups come only
-// from the roster: a group exists because somebody is in it. They can be
-// removed from reporting, so a typo or a group you don't report on stops
-// polluting the charts, and added back — but never invented, which is why the
-// add control is a picker over real values rather than a text box.
+// from the roster: a group exists because somebody is in it. The two columns
+// are simply which groups you're reporting on and which you aren't; moving one
+// across never touches roster data. They're listed flat rather than sectioned
+// per cut, so each pill carries its cut name to stay unambiguous.
 export default function OrgCuts({
   people,
   cutFields = [],
@@ -36,16 +37,31 @@ export default function OrgCuts({
 }) {
   const [draft, setDraft] = useState("");
 
-  const groups = allCutFields(cutFields, hiddenCuts).map((f) => ({
-    ...f,
-    cuts: cutsFor(people, f.key, hiddenValues),
-    removed: restorableCutValues(people, f.key, hiddenValues),
-  }));
+  const fields = allCutFields(cutFields, hiddenCuts);
+
+  const selected = [];
+  const available = [];
+  for (const field of fields) {
+    for (const c of cutsFor(people, field.key, hiddenValues)) {
+      selected.push({ field, value: c.value, count: c.count });
+    }
+    for (const v of restorableCutValues(people, field.key, hiddenValues)) {
+      available.push({ field, value: v });
+    }
+  }
+
+  // Grouped-ish ordering without headings: same cut stays together, biggest
+  // groups first inside it.
+  const order = (a, b) =>
+    a.field.label.localeCompare(b.field.label) ||
+    (b.count || 0) - (a.count || 0) ||
+    a.value.localeCompare(b.value);
+  selected.sort(order);
+  available.sort(order);
 
   const hiddenFields = hiddenBuiltIns(hiddenCuts);
-
   const taken = new Set([
-    ...groups.map((g) => g.label.toLowerCase()),
+    ...fields.map((f) => f.label.toLowerCase()),
     ...hiddenFields.map((h) => h.label.toLowerCase()),
   ]);
   const suggestions = SUGGESTIONS.filter((s) => !taken.has(s.toLowerCase()));
@@ -66,126 +82,118 @@ export default function OrgCuts({
         <div className={styles.headText}>
           <div className={styles.title}>Your org cuts</div>
           <div className={styles.sub}>
-            The slices every result can be broken down by — taken from the roster
+            Everything the results can be broken down by — taken from the roster
           </div>
         </div>
       </div>
 
-      {groups.length === 0 && (
-        <div className={styles.empty}>
-          No cuts right now. Add one below to start slicing the results.
-        </div>
-      )}
-
-      {groups.map((g) => (
-        <div key={g.key} className={styles.cutGroup}>
-          <div className={styles.cutHeader}>
-            <span className={styles.cutLabel}>
-              {g.label} · {g.cuts.length}
-            </span>
-            <button
-              type="button"
-              className={styles.cutRemove}
-              onClick={() => (g.custom ? onRemoveField(g.label) : onHideCut(g.key))}
-              aria-label={`Remove the ${g.label} cut`}
-            >
-              <X size={12} />
-              Remove cut
-            </button>
-          </div>
-
-          {/* Two areas, always in the same order: what's being reported on,
-              then the shelf of what isn't. Groups move between them on a
-              click, and both are labelled so it's obvious which is which. */}
-          {g.cuts.length === 0 && g.removed.length === 0 ? (
-            <span className={styles.sub}>
-              Nothing yet — fill in the {g.label} column on the roster and the
-              groups will appear here.
-            </span>
-          ) : (
-            <>
-              <div className={styles.areaLabel}>In your reporting</div>
-              <div className={styles.chips}>
-                {g.cuts.map((c) => (
-                  <span key={c.value} className={styles.chip}>
-                    {c.value}
-                    <span className={styles.chipCount}>{c.count}</span>
-                    <button
-                      type="button"
-                      className={styles.chipRemove}
-                      onClick={() => onRemoveValue(g.key, c.value)}
-                      aria-label={`Remove ${c.value} from ${g.label}`}
-                      title={`Set ${c.value} aside`}
-                    >
-                      <X size={12} />
-                    </button>
-                  </span>
-                ))}
-                {g.cuts.length === 0 && (
-                  <span className={styles.sub}>
-                    None — click one from the shelf below.
-                  </span>
-                )}
-              </div>
-
-              {g.removed.length > 0 && (
-                <div className={styles.shelf}>
-                  <div className={styles.areaLabel}>
-                    Set aside · click to add back
-                  </div>
-                  <div className={styles.chips}>
-                    {g.removed.map((v) => (
-                      <button
-                        key={v}
-                        type="button"
-                        className={styles.chip}
-                        data-off="true"
-                        onClick={() => onAddValue(g.key, v)}
-                        aria-label={`Add ${v} back to ${g.label}`}
-                        title={`Add ${v} back`}
-                      >
-                        <Plus size={12} />
-                        {v}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </>
-          )}
-        </div>
-      ))}
-
-      {hiddenFields.length > 0 && (
-        <div className={`${styles.cutGroup} ${styles.shelf}`}>
-          <div className={styles.areaLabel}>
-            Cuts set aside · click to add back
-          </div>
+      <div className={styles.buckets}>
+        <div className={styles.bucket}>
+          <div className={styles.bucketLabel}>Selected · {selected.length}</div>
           <div className={styles.chips}>
-            {hiddenFields.map((h) => (
+            {selected.map((item) => (
+              <span key={`${item.field.key}::${item.value}`} className={styles.chip}>
+                <span className={styles.chipField}>{item.field.label}</span>
+                {item.value}
+                <span className={styles.chipCount}>{item.count}</span>
+                <button
+                  type="button"
+                  className={styles.chipRemove}
+                  onClick={() => onRemoveValue(item.field.key, item.value)}
+                  aria-label={`Remove ${item.value} from ${item.field.label}`}
+                  title={`Move ${item.value} to available`}
+                >
+                  <X size={12} />
+                </button>
+              </span>
+            ))}
+            {selected.length === 0 && (
+              <span className={styles.sub}>
+                Nothing selected — pick from the right.
+              </span>
+            )}
+          </div>
+        </div>
+
+        <div className={`${styles.bucket} ${styles.bucketOff}`}>
+          <div className={styles.bucketLabel}>Available · {available.length}</div>
+          <div className={styles.chips}>
+            {available.map((item) => (
               <button
-                key={h.key}
+                key={`${item.field.key}::${item.value}`}
                 type="button"
                 className={styles.chip}
                 data-off="true"
-                onClick={() => onRestoreCut(h.key)}
-                aria-label={`Add the ${h.label} cut back`}
-                title={`Add ${h.label} back`}
+                onClick={() => onAddValue(item.field.key, item.value)}
+                aria-label={`Add ${item.value} back to ${item.field.label}`}
+                title={`Move ${item.value} to selected`}
               >
                 <Plus size={12} />
-                {h.label}
+                <span className={styles.chipField}>{item.field.label}</span>
+                {item.value}
               </button>
             ))}
+            {available.length === 0 && (
+              <span className={styles.sub}>
+                {selected.length === 0
+                  ? "Fill in a cut column on the roster and groups will appear here."
+                  : "Everything is selected."}
+              </span>
+            )}
           </div>
         </div>
-      )}
+      </div>
 
-      <div className={styles.cutGroup}>
-        <div className={styles.cutLabel}>Add a cut of your own</div>
-        <div className={styles.fieldRow}>
+      {/* Managing the dimensions themselves, kept apart from choosing groups. */}
+      <div className={styles.cutStrip}>
+        <div className={styles.bucketLabel}>Cuts</div>
+        <div className={styles.chips}>
+          {fields.map((f) => (
+            <span key={f.key} className={styles.chip}>
+              {f.label}
+              <button
+                type="button"
+                className={styles.chipRemove}
+                onClick={() => (f.custom ? onRemoveField(f.label) : onHideCut(f.key))}
+                aria-label={`Remove the ${f.label} cut`}
+                title={`Remove the ${f.label} cut`}
+              >
+                <X size={12} />
+              </button>
+            </span>
+          ))}
+          {hiddenFields.map((h) => (
+            <button
+              key={h.key}
+              type="button"
+              className={styles.chip}
+              data-off="true"
+              onClick={() => onRestoreCut(h.key)}
+              aria-label={`Add the ${h.label} cut back`}
+              title={`Add the ${h.label} cut back`}
+            >
+              <Plus size={12} />
+              {h.label}
+            </button>
+          ))}
+          {suggestions.map((s) => (
+            <button
+              key={s}
+              type="button"
+              className={styles.chip}
+              data-off="true"
+              onClick={() => addField(s)}
+              title={`Add a ${s} cut`}
+            >
+              <Plus size={12} />
+              {s}
+            </button>
+          ))}
+        </div>
+        <div className={styles.fieldRow} style={{ marginTop: 10 }}>
           <input
             className={styles.input}
-            placeholder="e.g. Region"
+            placeholder="Add a cut of your own — e.g. Business unit"
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && addField(draft)}
@@ -200,26 +208,11 @@ export default function OrgCuts({
             Add cut
           </button>
         </div>
-        {suggestions.length > 0 && (
-          <div className={styles.chips} style={{ marginTop: 10 }}>
-            {suggestions.map((s) => (
-              <button
-                key={s}
-                type="button"
-                className={styles.chip}
-                onClick={() => addField(s)}
-              >
-                <Plus size={12} />
-                {s}
-              </button>
-            ))}
-          </div>
-        )}
-        <div className={styles.hint}>
-          Groups move between the two areas on a click — × to set one aside, or
-          click it on the shelf to bring it back. Only what&apos;s in your reporting
-          appears in the results. The roster keeps every value either way.
-        </div>
+      </div>
+
+      <div className={styles.hint}>
+        Only what&apos;s selected appears in the results. Moving a group between the
+        two columns never changes the roster, and a cut is a column on it.
       </div>
     </div>
   );

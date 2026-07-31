@@ -167,23 +167,49 @@
   margin-bottom: 16px;
 }
 
-/* Labels the two areas — what's being reported on, and the shelf below it. */
-.areaLabel {
+/* Selected on the left, available on the right. Position carries the meaning,
+   so the two only need naming, not explaining. */
+.buckets {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.bucket {
+  min-width: 0;
+  padding: 11px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  min-height: 92px;
+}
+
+.bucketOff {
+  background: var(--inset);
+  border-style: dashed;
+}
+
+.bucketLabel {
   font-size: var(--fs-eyebrow);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--text-faint);
-  margin-bottom: 7px;
+  margin-bottom: 9px;
 }
 
-/* The shelf. Recessed so it reads as a holding area rather than part of the
-   live set above it. */
-.shelf {
-  margin-top: 10px;
-  padding: 10px 12px;
-  background: var(--inset);
-  border: 1px dashed var(--border);
-  border-radius: 8px;
+/* Which cut a group belongs to, since the columns aren't sectioned. */
+.chipField {
+  color: var(--text-faint);
+  border-right: 1px solid var(--border);
+  padding-right: 7px;
+  margin-right: 1px;
+}
+
+/* Managing the dimensions, kept visually apart from choosing groups. */
+.cutStrip {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
 }
 
 /* A group that's been left out. Same pill, dialled down, and the whole thing
@@ -211,46 +237,6 @@
   letter-spacing: 0.05em;
   color: var(--text-faint);
   margin-bottom: 7px;
-}
-
-.cutHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 7px;
-}
-
-.cutHeader .cutLabel {
-  margin-bottom: 0;
-}
-
-/* A bare 12px icon was effectively invisible and impossible to hit. Labelled,
-   and sized to a real target. */
-.cutRemove {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  flex: none;
-  min-height: 28px;
-  padding: 4px 10px;
-  background: none;
-  border: 1px solid transparent;
-  border-radius: 8px;
-  color: var(--text-faint);
-  font-size: var(--fs-sub);
-  cursor: pointer;
-  transition: color 0.15s ease, border-color 0.15s ease;
-}
-
-.cutRemove:hover {
-  color: #f0a396;
-  border-color: rgba(224, 64, 42, 0.45);
-}
-
-.cutRemove:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
 }
 
 /* Suggestion chips are buttons, so they need the affordance. */
@@ -297,6 +283,11 @@ button.chip:hover {
 }
 
 @media (max-width: 760px) {
+  /* Side by side stops being readable well before the phone breakpoint. */
+  .buckets {
+    grid-template-columns: 1fr;
+  }
+
   .fieldRow {
     flex-direction: column;
     align-items: stretch;
