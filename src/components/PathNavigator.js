@@ -1,13 +1,15 @@
 "use client";
 
-import { steps as allSteps } from "@/lib/steps";
 import styles from "./PathNavigator.module.css";
 
+// `steps` is required — defaulting it to the team journey's list would let a
+// second journey silently render the wrong path.
 export default function PathNavigator({
-  steps = allSteps,
+  steps,
+  navLabel = "Team journey",
   activeStepId,
   onSelect,
-  unlockedIndex = allSteps.length - 1,
+  unlockedIndex = steps.length - 1,
 }) {
   const activeIndex = Math.max(
     0,
@@ -17,7 +19,7 @@ export default function PathNavigator({
   const progress = steps.length > 1 ? activeIndex / (steps.length - 1) : 0;
 
   return (
-    <nav className={styles.nav} aria-label="Team journey" data-tour="path">
+    <nav className={styles.nav} aria-label={navLabel} data-tour="path">
       <div
         className={styles.steps}
         style={{ "--step-count": steps.length, "--progress": progress }}

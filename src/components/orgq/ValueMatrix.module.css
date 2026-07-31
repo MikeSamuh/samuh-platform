@@ -1,0 +1,142 @@
+.wrap {
+  display: flex;
+  gap: 16px;
+  align-items: stretch;
+  flex-wrap: wrap;
+}
+
+.plotArea {
+  flex: 1;
+  min-width: 280px;
+  display: flex;
+  gap: 8px;
+}
+
+.yAxis {
+  display: flex;
+  align-items: center;
+  font-size: var(--fs-eyebrow);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-faint);
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
+.plotColumn {
+  flex: 1;
+  min-width: 0;
+}
+
+.plot {
+  position: relative;
+  aspect-ratio: 1.35;
+  background: var(--inset);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Quadrant dividers */
+.plot::before,
+.plot::after {
+  content: "";
+  position: absolute;
+  background: var(--border);
+}
+
+.plot::before {
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+}
+
+.plot::after {
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+}
+
+.priorityZone {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 50%;
+  height: 50%;
+  background: rgba(74, 158, 255, 0.07);
+}
+
+.quadrantLabel {
+  position: absolute;
+  font-size: var(--fs-eyebrow);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-faint);
+  padding: 7px 9px;
+  pointer-events: none;
+}
+
+.dot {
+  position: absolute;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid var(--inset);
+  transform: translate(-50%, 50%);
+  cursor: default;
+}
+
+.dot[data-priority="true"] {
+  background: var(--band-struggling);
+}
+
+.xAxis {
+  font-size: var(--fs-eyebrow);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-faint);
+  text-align: center;
+  padding-top: 7px;
+}
+
+.key {
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: var(--fs-sub);
+}
+
+.keyItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-dim);
+}
+
+.keyDot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex: none;
+  background: var(--accent);
+}
+
+.keyDot[data-priority="true"] {
+  background: var(--band-struggling);
+}
+
+.keyName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 760px) {
+  .key {
+    width: 100%;
+  }
+}
