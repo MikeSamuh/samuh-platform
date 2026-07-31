@@ -94,52 +94,73 @@ export default function OrgCuts({
             </button>
           </div>
 
-          {/* Every group in the cut as one pill. Included ones carry their
-              count and an X; excluded ones are dimmed and click to come back.
-              Nothing to type, and the full set is visible at a glance. */}
-          <div className={styles.chips}>
-            {g.cuts.map((c) => (
-              <span key={c.value} className={styles.chip}>
-                {c.value}
-                <span className={styles.chipCount}>{c.count}</span>
-                <button
-                  type="button"
-                  className={styles.chipRemove}
-                  onClick={() => onRemoveValue(g.key, c.value)}
-                  aria-label={`Remove ${c.value} from ${g.label}`}
-                  title={`Remove ${c.value}`}
-                >
-                  <X size={12} />
-                </button>
-              </span>
-            ))}
-            {g.removed.map((v) => (
-              <button
-                key={v}
-                type="button"
-                className={styles.chip}
-                data-off="true"
-                onClick={() => onAddValue(g.key, v)}
-                aria-label={`Add ${v} back to ${g.label}`}
-                title={`Add ${v} back`}
-              >
-                <Plus size={12} />
-                {v}
-              </button>
-            ))}
-            {g.cuts.length === 0 && g.removed.length === 0 && (
-              <span className={styles.sub}>
-                Nothing yet — fill in the {g.label} column on the roster and the
-                groups will appear here.
-              </span>
-            )}
-          </div>
+          {/* Two areas, always in the same order: what's being reported on,
+              then the shelf of what isn't. Groups move between them on a
+              click, and both are labelled so it's obvious which is which. */}
+          {g.cuts.length === 0 && g.removed.length === 0 ? (
+            <span className={styles.sub}>
+              Nothing yet — fill in the {g.label} column on the roster and the
+              groups will appear here.
+            </span>
+          ) : (
+            <>
+              <div className={styles.areaLabel}>In your reporting</div>
+              <div className={styles.chips}>
+                {g.cuts.map((c) => (
+                  <span key={c.value} className={styles.chip}>
+                    {c.value}
+                    <span className={styles.chipCount}>{c.count}</span>
+                    <button
+                      type="button"
+                      className={styles.chipRemove}
+                      onClick={() => onRemoveValue(g.key, c.value)}
+                      aria-label={`Remove ${c.value} from ${g.label}`}
+                      title={`Set ${c.value} aside`}
+                    >
+                      <X size={12} />
+                    </button>
+                  </span>
+                ))}
+                {g.cuts.length === 0 && (
+                  <span className={styles.sub}>
+                    None — click one from the shelf below.
+                  </span>
+                )}
+              </div>
+
+              {g.removed.length > 0 && (
+                <div className={styles.shelf}>
+                  <div className={styles.areaLabel}>
+                    Set aside · click to add back
+                  </div>
+                  <div className={styles.chips}>
+                    {g.removed.map((v) => (
+                      <button
+                        key={v}
+                        type="button"
+                        className={styles.chip}
+                        data-off="true"
+                        onClick={() => onAddValue(g.key, v)}
+                        aria-label={`Add ${v} back to ${g.label}`}
+                        title={`Add ${v} back`}
+                      >
+                        <Plus size={12} />
+                        {v}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
         </div>
       ))}
 
       {hiddenFields.length > 0 && (
-        <div className={styles.cutGroup}>
-          <div className={styles.cutLabel}>Removed cuts</div>
+        <div className={`${styles.cutGroup} ${styles.shelf}`}>
+          <div className={styles.areaLabel}>
+            Cuts set aside · click to add back
+          </div>
           <div className={styles.chips}>
             {hiddenFields.map((h) => (
               <button
@@ -195,8 +216,9 @@ export default function OrgCuts({
           </div>
         )}
         <div className={styles.hint}>
-          Click a pill&apos;s × to leave a group out of your reporting, or a dimmed
-          pill to bring it back. The roster keeps every value either way.
+          Groups move between the two areas on a click — × to set one aside, or
+          click it on the shelf to bring it back. Only what&apos;s in your reporting
+          appears in the results. The roster keeps every value either way.
         </div>
       </div>
     </div>

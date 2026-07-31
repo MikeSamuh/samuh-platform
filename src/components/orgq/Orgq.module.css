@@ -167,6 +167,25 @@
   margin-bottom: 16px;
 }
 
+/* Labels the two areas — what's being reported on, and the shelf below it. */
+.areaLabel {
+  font-size: var(--fs-eyebrow);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-faint);
+  margin-bottom: 7px;
+}
+
+/* The shelf. Recessed so it reads as a holding area rather than part of the
+   live set above it. */
+.shelf {
+  margin-top: 10px;
+  padding: 10px 12px;
+  background: var(--inset);
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+}
+
 /* A group that's been left out. Same pill, dialled down, and the whole thing
    is the button — one click brings it back. */
 .chip[data-off="true"] {
